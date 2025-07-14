@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Disc3, LayoutDashboard, LogOut, Search, Settings, User as UserIcon } from "lucide-react";
+import { BookOpen, Disc3, LayoutDashboard, LogOut, Search, Settings, User as UserIcon, Library } from "lucide-react";
 import {
   SidebarProvider,
   Sidebar,
@@ -31,6 +31,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const getPageTitle = () => {
     const segment = pathname.split('/').filter(Boolean)[0] || 'dashboard';
     if (segment === 'lessons' && pathname.split('/').length > 2) return 'Lesson Details';
+    if (segment === 'courses' && pathname.split('/').length > 2) return 'Course Details';
     return segment.charAt(0).toUpperCase() + segment.slice(1).replace('-', ' ');
   }
 
@@ -51,6 +52,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   <Link href="/dashboard">
                     <LayoutDashboard />
                     Dashboard
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton href="/courses" isActive={isActive('/courses')} asChild tooltip="Courses">
+                  <Link href="/courses">
+                    <Library />
+                    Courses
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

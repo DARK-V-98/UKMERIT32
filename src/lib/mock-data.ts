@@ -1,3 +1,22 @@
+export const courses = [
+  {
+    id: "1",
+    title: "Beginner's English Grammar",
+    description: "A complete guide to the fundamental grammar rules for beginner learners.",
+    thumbnailUrl: "https://placehold.co/400x225.png",
+    imageHint: "grammar book",
+    lessonIds: ["1", "4"],
+  },
+  {
+    id: "2",
+    title: "Conversational English for Professionals",
+    description: "Improve your speaking and listening skills for business and social situations.",
+    thumbnailUrl: "https://placehold.co/400x225.png",
+    imageHint: "people conversing office",
+    lessonIds: ["2", "3", "5", "6"],
+  }
+];
+
 export const lessons = [
   {
     id: "1",
