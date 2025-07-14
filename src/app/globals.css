@@ -4,28 +4,28 @@
 
 @layer base {
   :root {
-    --background: 0 0% 94.1%; /* #F0F0F0 */
+    --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 45 88% 53%; /* Gold */
+    --primary: 45 88% 53%; /* Gold from logo */
     --primary-foreground: 224 71.4% 4.1%;
-    --secondary: 210 85% 53%; /* Blue */
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 220 75% 35%; /* Blue from logo */
+    --secondary-foreground: 0 0% 98%;
     --muted: 220 13% 91%;
     --muted-foreground: 220 8.9% 43.1%;
-    --accent: 350 85% 42%; /* Red */
-    --accent-foreground: 210 20% 98%;
+    --accent: 0 84.2% 60.2%; /* Red from logo */
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 13% 91%;
+    --border: 220 13% 88%;
     --input: 220 13% 91%;
-    --ring: 210 85% 53%; /* Blue */
-    --chart-1: 45 88% 53%;
-    --chart-2: 350 85% 42%;
-    --chart-3: 210 85% 53%;
+    --ring: 220 75% 35%; /* Blue from logo */
+    --chart-1: 45 88% 53%; /* Gold */
+    --chart-2: 220 75% 45%; /* Blue */
+    --chart-3: 0 84.2% 60.2%; /* Red */
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
@@ -47,20 +47,20 @@
     --popover-foreground: 210 20% 98%;
     --primary: 45 88% 53%;
     --primary-foreground: 224 71.4% 4.1%;
-    --secondary: 210 85% 63%;
+    --secondary: 220 75% 55%;
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 350 85% 62%;
+    --accent: 0 84.2% 70.2%;
     --accent-foreground: 210 20% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    --ring: 210 85% 63%;
+    --ring: 220 75% 55%;
     --chart-1: 45 88% 53%;
-    --chart-2: 350 85% 62%;
-    --chart-3: 210 85% 63%;
+    --chart-2: 220 75% 55%;
+    --chart-3: 0 84.2% 70.2%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --sidebar-background: 224 71.4% 4.1%;

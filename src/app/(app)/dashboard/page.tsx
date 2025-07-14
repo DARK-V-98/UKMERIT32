@@ -16,26 +16,7 @@ const chartData = [
 const chartConfig = {
   score: {
     label: "Score",
-  },
-  tenses: {
-    label: "Tenses",
     color: "hsl(var(--chart-1))",
-  },
-  nouns: {
-    label: "Nouns",
-    color: "hsl(var(--chart-2))",
-  },
-  verbs: {
-    label: "Verbs",
-    color: "hsl(var(--chart-3))",
-  },
-   adjectives: {
-    label: "Adjectives",
-    color: "hsl(var(--chart-4))",
-  },
-  adverbs: {
-    label: "Adverbs",
-    color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig;
 
@@ -61,7 +42,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-            <Target className="h-4 w-4 text-secondary" />
+            <Target className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">88%</div>
@@ -71,7 +52,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Top Skill</CardTitle>
-            <Star className="h-4 w-4 text-accent" />
+            <Star className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Vocabulary</div>
@@ -107,11 +88,7 @@ export default function DashboardPage() {
                 tickFormatter={(value) => value.slice(0, 8)}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="score" radius={4}>
-                 {chartData.map((entry, index) => (
-                    <div key={`cell-${index}`}  />
-                  ))}
-              </Bar>
+              <Bar dataKey="score" fill="var(--color-score)" radius={4} />
             </BarChart>
           </ChartContainer>
         </CardContent>

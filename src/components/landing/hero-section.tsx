@@ -15,7 +15,7 @@ export function HeroSection() {
             Join UK MERIT ACADEMY for engaging video lessons, interactive quizzes, and a supportive community of learners.
           </p>
           <div className="mt-8 flex justify-center lg:justify-start gap-4">
-            <Button size="lg" asChild variant="secondary">
+            <Button size="lg" asChild>
               <Link href="/signup">Get Started for Free</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>

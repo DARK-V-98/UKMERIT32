@@ -15,8 +15,8 @@ export function SiteFooter() {
               Your partner in education and professional development.
             </p>
             <div className="flex gap-4">
-              <Link href="https://www.youtube.com/@FreeEnglishinSinhala" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary"><Youtube /></Link>
-              <Link href="https://www.facebook.com/FreeEnglishSinhala?mibextid=ZbWKwL" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary"><Facebook /></Link>
+              <Link href="https://www.youtube.com/@FreeEnglishinSinhala" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><Youtube /></Link>
+              <Link href="https://www.facebook.com/FreeEnglishSinhala?mibextid=ZbWKwL" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><Facebook /></Link>
             </div>
           </div>
           <div className="md:col-start-3 grid grid-cols-2 md:grid-cols-3 gap-8">

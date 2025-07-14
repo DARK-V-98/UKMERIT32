@@ -43,7 +43,7 @@ export default function LoginPage() {
             </div>
             <Input id="password" type="password" required />
           </div>
-          <Button asChild variant="secondary">
+          <Button asChild>
             <Link href="/dashboard" className="w-full text-center">Login</Link>
           </Button>
           <Button variant="outline" className="w-full">

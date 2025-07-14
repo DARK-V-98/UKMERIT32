@@ -39,7 +39,7 @@ export default function SignupPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" />
           </div>
-           <Button asChild variant="secondary">
+           <Button asChild>
             <Link href="/dashboard" className="w-full text-center">Create an account</Link>
           </Button>
           <Button variant="outline" className="w-full">
