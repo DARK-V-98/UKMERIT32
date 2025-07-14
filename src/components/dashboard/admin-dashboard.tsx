@@ -1,0 +1,158 @@
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { Users, BookOpen, MessageSquare, CheckCircle } from "lucide-react";
+import { siteStats, users } from "@/lib/mock-data";
+import { Button } from "../ui/button";
+
+const monthlyData = [
+  { month: 'Jan', signups: 120, active: 80 },
+  { month: 'Feb', signups: 150, active: 100 },
+  { month: 'Mar', signups: 200, active: 160 },
+  { month: 'Apr', signups: 180, active: 140 },
+  { month: 'May', signups: 250, active: 200 },
+  { month: 'Jun', signups: 220, active: 180 },
+];
+
+export default function AdminDashboard() {
+  return (
+    <div className="flex flex-col gap-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+        <p className="text-muted-foreground">Overview of the platform's activity and users.</p>
+      </div>
+
+       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{siteStats.totalUsers.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">+50 this week</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
+            <BookOpen className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{siteStats.activeCourses}</div>
+            <p className="text-xs text-muted-foreground">+1 new course this month</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Forum Threads</CardTitle>
+            <MessageSquare className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{siteStats.forumThreads}</div>
+            <p className="text-xs text-muted-foreground">+25 threads this week</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed Lessons</CardTitle>
+            <CheckCircle className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{siteStats.completedLessons.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">+150 this week</p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid gap-8 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>User Growth</CardTitle>
+            <CardDescription>Monthly new user signups and active users.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="signups" fill="hsl(var(--primary))" name="New Signups" />
+                <Bar dataKey="active" fill="hsl(var(--secondary))" name="Active Users" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Platform Health</CardTitle>
+             <CardDescription>Key metrics for the last 30 days.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+             <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Server Uptime</p>
+                <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">99.98%</Badge>
+             </div>
+             <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Average Response Time</p>
+                <p className="font-semibold">120ms</p>
+             </div>
+             <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Error Rate</p>
+                <p className="font-semibold">0.02%</p>
+             </div>
+             <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">New Issues Reported</p>
+                <p className="font-semibold">3</p>
+             </div>
+             <div className="pt-4">
+                <Button variant="outline" className="w-full">View System Status Page</Button>
+             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Users</CardTitle>
+          <CardDescription>A list of the newest users on the platform.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Enrollment Date</TableHead>
+                <TableHead className="text-right">Progress</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.slice(0, 5).map(user => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={user.avatar} alt={user.name} data-ai-hint="person face" />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{user.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.enrolled}</TableCell>
+                  <TableCell className="text-right">{user.progress}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

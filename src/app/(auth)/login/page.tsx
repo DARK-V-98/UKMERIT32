@@ -23,9 +23,11 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
@@ -35,11 +37,14 @@ export default function LoginPage() {
         description: error.message,
         variant: "destructive",
       })
+    } finally {
+      setLoading(false);
     }
   }
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
+    setLoading(true);
     try {
       await signInWithPopup(auth, provider);
       router.push("/dashboard");
@@ -49,6 +54,8 @@ export default function LoginPage() {
         description: error.message,
         variant: "destructive",
       })
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -71,6 +78,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
           </div>
           <div className="grid gap-2">
@@ -89,14 +97,15 @@ export default function LoginPage() {
               required 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Login
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </Button>
         </form>
-         <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn}>
-            Login with Google
+         <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={loading}>
+            {loading ? "Please wait..." : "Login with Google"}
           </Button>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}

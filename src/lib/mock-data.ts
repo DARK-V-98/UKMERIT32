@@ -1,3 +1,4 @@
+
 export const courses = [
   {
     id: "1",
@@ -184,3 +185,18 @@ export const forums = [
     posts: 1503,
   },
 ];
+
+export const users = [
+    { id: '1', name: 'Alex Turner', email: 'alex.t@example.com', role: 'Student', enrolled: '2023-10-26', progress: 75, avatar: 'https://placehold.co/100x100.png' },
+    { id: '2', name: 'Samantha Lee', email: 'sam.l@example.com', role: 'Student', enrolled: '2023-11-15', progress: 50, avatar: 'https://placehold.co/100x100.png' },
+    { id: '3', name: 'David Chen', email: 'david.c@example.com', role: 'Student', enrolled: '2024-01-05', progress: 90, avatar: 'https://placehold.co/100x100.png' },
+    { id: '4', name: 'Maria Garcia', email: 'maria.g@example.com', role: 'Student', enrolled: '2024-02-20', progress: 30, avatar: 'https://placehold.co/100x100.png' },
+    { id: '5', name: 'James Wilson', email: 'james.w@example.com', role: 'Student', enrolled: '2024-03-10', progress: 100, status: 'Completed', avatar: 'https://placehold.co/100x100.png' },
+];
+
+export const siteStats = {
+  totalUsers: 1482,
+  activeCourses: 15,
+  completedLessons: 2390,
+  forumThreads: 489,
+};
