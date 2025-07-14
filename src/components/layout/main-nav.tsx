@@ -84,7 +84,7 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
             </Sheet>
         </div>
 
-        <Link href="/" className="flex items-center space-x-2 md:hidden flex-1">
+        <Link href="/" className="flex items-center space-x-2 md:hidden flex-1 justify-center">
           <Image src="/uk.png" alt="UK MERIT ACADEMY (PVT) LTD Logo" width={160} height={40} className="object-contain"/>
         </Link>
         
@@ -92,14 +92,14 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <>
+            <div className="hidden sm:flex">
               <Button variant="ghost" asChild>
                 <Link href="/login">Login</Link>
               </Button>
               <Button asChild>
                 <Link href="/signup">Sign up</Link>
               </Button>
-            </>
+            </div>
           )}
         </div>
       </div>

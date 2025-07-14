@@ -7,7 +7,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t bg-card text-card-foreground">
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex flex-col items-start gap-4">
             <Link href="/" className="flex items-center gap-2">
               <Image src="/uk.png" alt="UK MERIT ACADEMY (PVT) LTD Logo" width={180} height={45} className="object-contain" />
@@ -20,11 +20,11 @@ export function SiteFooter() {
               <Link href="https://www.facebook.com/FreeEnglishSinhala?mibextid=ZbWKwL" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><Facebook /></Link>
             </div>
           </div>
-          <div className="md:col-start-3 grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-8">
               <div>
                   <h4 className="font-semibold mb-4">Platform</h4>
                   <ul className="space-y-2">
-                      <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Features</Link></li>
+                      <li><Link href="/courses" className="text-sm text-muted-foreground hover:text-foreground">Courses</Link></li>
                       <li><Link href="/lessons" className="text-sm text-muted-foreground hover:text-foreground">Lessons</Link></li>
                       <li><Link href="/forums" className="text-sm text-muted-foreground hover:text-foreground">Forums</Link></li>
                   </ul>
