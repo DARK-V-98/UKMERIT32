@@ -11,6 +11,7 @@ import {
 
 export function MainNav() {
   const navLinks = [
+    { href: "/courses", label: "Courses" },
     { href: "/lessons", label: "Lessons" },
     { href: "/forums", label: "Forums" },
   ];
