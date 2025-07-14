@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { usePathname, useRouter } from 'next/navigation';
 import { MainNav } from '@/components/layout/main-nav';
 import { SiteFooter } from '@/components/layout/site-footer';
@@ -40,8 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if(userDoc.exists()) {
             const userData = userDoc.data();
             setProfileComplete(userData.profileComplete);
-            // Default role to 'user' if it doesn't exist
-            setIsAdmin(userData.role === 'admin');
+            
+            if (userData.role) {
+                setIsAdmin(userData.role === 'admin');
+            } else {
+                // Set default role if not present
+                await setDoc(userDocRef, { role: 'user' }, { merge: true });
+                setIsAdmin(false);
+            }
         } else {
             // This case can happen if user is created but firestore doc fails
             setProfileComplete(false);
@@ -125,6 +131,7 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
+      <MainNav />
       <main className="flex-1">
         <ProtectedRoutes>
           <div className="container py-8">
@@ -132,6 +139,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </ProtectedRoutes>
       </main>
+      <SiteFooter />
     </div>
   );
 }
