@@ -30,8 +30,18 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists() && userDoc.data().profileComplete) {
+        router.push("/dashboard");
+      } else {
+        router.push("/complete-profile");
+      }
+
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -65,8 +75,11 @@ export default function LoginPage() {
             profileComplete: false, // Flag for profile completion
           }, { merge: true });
         router.push("/complete-profile");
+      } else if (userDoc.exists() && !userDoc.data().profileComplete) {
+        // Existing user but profile is not complete
+        router.push("/complete-profile");
       } else {
-        // Existing user
+        // Existing user with complete profile
         router.push("/dashboard");
       }
 
