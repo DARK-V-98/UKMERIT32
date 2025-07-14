@@ -119,7 +119,7 @@ export function MainNav() {
 function UserMenu() {
   const router = useRouter();
   const { toast } = useToast();
-  const user = auth.currentUser;
+  const { user } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -143,7 +143,7 @@ function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9 border">
-            <AvatarImage src={user?.photoURL || "https://placehold.co/100x100.png"} alt={user?.displayName || "User"} data-ai-hint="person face" />
+            <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || "User"} />
             <AvatarFallback>{user?.displayName?.[0] || user?.email?.[0] || 'U'}</AvatarFallback>
           </Avatar>
         </Button>

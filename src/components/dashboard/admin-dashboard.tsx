@@ -138,8 +138,8 @@ export default function AdminDashboard() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarImage src={user.avatar} alt={user.name} data-ai-hint="person face" />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name?.[0] || user.email?.[0] || 'U'}</AvatarFallback>
                       </Avatar>
                       <span className="font-medium">{user.name}</span>
                     </div>
