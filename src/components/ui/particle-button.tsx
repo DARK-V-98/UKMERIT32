@@ -32,9 +32,13 @@ const createParticle = (x: number, y: number): Particle => {
 export const ParticleButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, className, onClick, ...props }, ref) => {
     const [particles, setParticles] = useState<Particle[]>([])
+    const buttonRef = useRef<HTMLButtonElement>(null)
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      const rect = e.currentTarget.getBoundingClientRect()
+      const target = buttonRef.current
+      if (!target) return
+
+      const rect = target.getBoundingClientRect()
       const x = e.clientX - rect.left
       const y = e.clientY - rect.top
 
@@ -78,30 +82,30 @@ export const ParticleButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
         }
       }
     }, [particles, updateParticles])
-
+    
     return (
       <Button
-        ref={ref}
+        ref={buttonRef}
         onClick={handleClick}
         className={cn("relative overflow-hidden", className)}
         {...props}
       >
         <span className="relative z-10">{children}</span>
         <div className="absolute inset-0 pointer-events-none">
-          {particles.map((p) => (
+            {particles.map((p) => (
             <div
-              key={p.id}
-              className="absolute rounded-full bg-accent"
-              style={{
+                key={p.id}
+                className="absolute rounded-full bg-accent"
+                style={{
                 left: p.x,
                 top: p.y,
                 width: `${p.size}px`,
                 height: `${p.size}px`,
                 opacity: p.alpha,
                 transform: `translate(-50%, -50%) rotate(${p.rotation}deg)`,
-              }}
+                }}
             />
-          ))}
+            ))}
         </div>
       </Button>
     )
