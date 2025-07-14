@@ -31,7 +31,7 @@ export function HeroSection() {
             objectFit="cover"
             data-ai-hint="language learning class"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent"></div>
         </div>
       </div>
     </section>
