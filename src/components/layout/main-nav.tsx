@@ -15,8 +15,11 @@ import { auth } from "@/lib/firebase"
 import { signOut } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/app/(app)/layout"
 
-export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
+export function MainNav() {
+  const { user: isAuthenticated } = useAuth();
+
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/courses", label: "Courses" },
