@@ -15,7 +15,7 @@ export function HeroSection() {
           data-ai-hint="language learning class"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
       </div>
       <div className="container relative mx-auto px-4 py-16 sm:py-24 lg:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
