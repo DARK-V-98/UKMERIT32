@@ -38,8 +38,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
         if(userDoc.exists()) {
-            setProfileComplete(userDoc.data().profileComplete);
-            setIsAdmin(userDoc.data().role === 'admin');
+            const userData = userDoc.data();
+            setProfileComplete(userData.profileComplete);
+            // Default role to 'user' if it doesn't exist
+            setIsAdmin(userData.role === 'admin');
         } else {
             // This case can happen if user is created but firestore doc fails
             setProfileComplete(false);
