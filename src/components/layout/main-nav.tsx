@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast"
 
 export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   const navLinks = [
+    { href: "/", label: "Home" },
     { href: "/courses", label: "Courses" },
     { href: "/lessons", label: "Lessons" },
     { href: "/forums", label: "Forums" },
