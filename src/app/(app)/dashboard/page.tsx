@@ -5,12 +5,10 @@ import { useAuth } from "@/app/(app)/layout";
 import AdminDashboard from "@/components/dashboard/admin-dashboard";
 import UserDashboard from "@/components/dashboard/user-dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Hardcoded admin email for prototype purposes
-const ADMIN_EMAIL = "admin@example.com";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
 
   if (loading) {
     return (
@@ -30,7 +28,28 @@ export default function DashboardPage() {
     );
   }
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  if (isAdmin) {
+    return (
+      <Tabs defaultValue="admin">
+        <div className="flex justify-between items-center">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                <p className="text-muted-foreground">Switch between admin and user views.</p>
+            </div>
+            <TabsList>
+                <TabsTrigger value="admin">Admin View</TabsTrigger>
+                <TabsTrigger value="user">User View</TabsTrigger>
+            </TabsList>
+        </div>
+        <TabsContent value="admin" className="mt-6">
+          <AdminDashboard />
+        </TabsContent>
+        <TabsContent value="user" className="mt-6">
+          <UserDashboard />
+        </TabsContent>
+      </Tabs>
+    );
+  }
 
-  return isAdmin ? <AdminDashboard /> : <UserDashboard />;
+  return <UserDashboard />;
 }

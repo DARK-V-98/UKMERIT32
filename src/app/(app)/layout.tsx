@@ -24,8 +24,6 @@ const AuthContext = createContext<AuthContextType>({
   profileComplete: undefined,
 });
 
-const ADMIN_EMAIL = "admin@example.com";
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,13 +33,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      setIsAdmin(user?.email === ADMIN_EMAIL);
       
       if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        setProfileComplete(userDoc.exists() && userDoc.data().profileComplete);
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if(userDoc.exists()) {
+            setProfileComplete(userDoc.data().profileComplete);
+            setIsAdmin(userDoc.data().role === 'admin');
+        } else {
+            // This case can happen if user is created but firestore doc fails
+            setProfileComplete(false);
+            setIsAdmin(false);
+        }
       } else {
         setProfileComplete(undefined);
+        setIsAdmin(false);
       }
       
       setLoading(false);
@@ -65,7 +71,7 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (loading) return; // Wait until auth state is determined
+    if (loading) return;
 
     const isAuthPage = ['/login', '/signup', '/'].includes(pathname);
     const isPublicPage = pathname.startsWith('/lessons/');
@@ -78,19 +84,18 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // If user is logged in, but profile is not complete, and they are not on the completion page
     if (profileComplete === false && !isProfileCompletionPage) {
         router.push('/complete-profile');
+        return;
     }
 
-    // If user is logged in, profile is complete, but they are trying to access login/signup
     if (profileComplete === true && (isAuthPage || isProfileCompletionPage)) {
       router.push('/dashboard');
+      return;
     }
 
   }, [user, loading, profileComplete, router, pathname]);
 
-  // Show a loading skeleton while we verify auth, or if we're about to redirect.
   if (loading || (!user && !['/login', '/signup', '/'].includes(pathname) && !pathname.startsWith('/lessons/')) || (user && profileComplete === false && pathname !== '/complete-profile')) {
     return (
        <div className="container py-8">
@@ -118,7 +123,6 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <MainNav />
       <main className="flex-1">
         <ProtectedRoutes>
           <div className="container py-8">
@@ -126,7 +130,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </ProtectedRoutes>
       </main>
-      <SiteFooter />
     </div>
   );
 }
