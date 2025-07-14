@@ -48,6 +48,16 @@ export function SiteFooter() {
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} UK MERIT ACADEMY (PVT) LTD. All rights reserved.
+          <br />
+          Powered by{" "}
+          <Link
+            href="https://www.esystemlk.xyz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground"
+          >
+            esystemlk
+          </Link>
         </div>
       </div>
     </footer>
