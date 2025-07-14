@@ -86,23 +86,25 @@ export const ParticleButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn("relative overflow-hidden", className)}
         {...props}
       >
-        <span className="z-10 transition-transform duration-200 active:scale-95">{children}</span>
-        <div className="absolute inset-0 pointer-events-none">
-          {particles.map((p) => (
-            <div
-              key={p.id}
-              className="absolute rounded-full bg-accent"
-              style={{
-                left: p.x,
-                top: p.y,
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                opacity: p.alpha,
-                transform: `translate(-50%, -50%) rotate(${p.rotation}deg)`,
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <span className="z-10 transition-transform duration-200 active:scale-95">{children}</span>
+          <div className="absolute inset-0 pointer-events-none">
+            {particles.map((p) => (
+              <div
+                key={p.id}
+                className="absolute rounded-full bg-accent"
+                style={{
+                  left: p.x,
+                  top: p.y,
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  opacity: p.alpha,
+                  transform: `translate(-50%, -50%) rotate(${p.rotation}deg)`,
+                }}
+              />
+            ))}
+          </div>
+        </>
       </Button>
     )
   }
