@@ -1,0 +1,22 @@
+import Link from "next/link"
+import { ParticleButton } from "../ui/particle-button"
+
+export function CtaSection() {
+  return (
+    <section className="bg-card">
+      <div className="container mx-auto px-4 py-16 sm:py-24 text-center">
+        <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Ready to Start Your Voyage?
+        </h2>
+        <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+          Create your free account today and take the first step towards English fluency.
+        </p>
+        <div className="mt-8">
+          <ParticleButton size="lg" asChild>
+            <Link href="/signup">Start Learning Now</Link>
+          </ParticleButton>
+        </div>
+      </div>
+    </section>
+  )
+}
