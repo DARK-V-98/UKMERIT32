@@ -1,5 +1,7 @@
+
 import Link from "next/link";
-import { BookOpen, Youtube, Facebook, Mail, Phone } from "lucide-react";
+import Image from "next/image";
+import { Youtube, Facebook, Mail, Phone } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -8,8 +10,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col items-start gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">UK MERIT ACADEMY</span>
+              <Image src="/uk.png" alt="UK MERIT ACADEMY (PVT) LTD Logo" width={180} height={45} className="object-contain" />
             </Link>
             <p className="text-sm text-muted-foreground">
               Your partner in education and professional development.

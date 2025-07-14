@@ -1,7 +1,8 @@
 
 "use client"
 import Link from "next/link"
-import { BookOpen, LogOut, Menu, Settings, User as UserIcon } from "lucide-react"
+import Image from "next/image"
+import { LogOut, Menu, Settings, User as UserIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -23,10 +24,7 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block">
-              UK MERIT ACADEMY (PVT) LTD
-            </span>
+            <Image src="/uk.png" alt="UK MERIT ACADEMY (PVT) LTD Logo" width={160} height={40} className="object-contain"/>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             {navLinks.map(link => (
@@ -63,8 +61,7 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
                   href="/"
                   className="flex items-center space-x-2"
                 >
-                  <BookOpen className="h-6 w-6 text-primary" />
-                  <span className="font-bold">UK MERIT ACADEMY (PVT) LTD</span>
+                  <Image src="/uk.png" alt="UK MERIT ACADEMY (PVT) LTD Logo" width={160} height={40} className="object-contain"/>
                 </Link>
                 <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                   <div className="flex flex-col space-y-3">
@@ -87,9 +84,8 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
             </Sheet>
         </div>
 
-        <Link href="/" className="flex items-center space-x-2 md:hidden">
-          <BookOpen className="h-6 w-6 text-primary" />
-          <span className="font-bold">UK MERIT ACADEMY (PVT) LTD</span>
+        <Link href="/" className="flex items-center space-x-2 md:hidden flex-1">
+          <Image src="/uk.png" alt="UK MERIT ACADEMY (PVT) LTD Logo" width={160} height={40} className="object-contain"/>
         </Link>
         
         <div className="flex flex-1 items-center justify-end space-x-2">
