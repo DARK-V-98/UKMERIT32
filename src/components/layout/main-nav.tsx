@@ -2,7 +2,7 @@
 "use client"
 import Link from "next/link"
 import Image from "next/image"
-import { LogOut, Menu, Settings, User as UserIcon } from "lucide-react"
+import { LogOut, Menu, Settings, User as UserIcon, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -96,14 +96,14 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <div className="hidden sm:flex">
-              <Button variant="ghost" asChild>
+            <>
+              <Button variant="ghost" asChild className="hidden sm:inline-flex">
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="hidden sm:inline-flex">
                 <Link href="/signup">Sign up</Link>
               </Button>
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -154,6 +154,10 @@ function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+         <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+          <LayoutDashboard className="mr-2 h-4 w-4" />
+          <span>Dashboard</span>
+        </DropdownMenuItem>
         <DropdownMenuItem>
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
