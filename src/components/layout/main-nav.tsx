@@ -11,7 +11,6 @@ import {
 
 export function MainNav() {
   const navLinks = [
-    { href: "#features", label: "Features" },
     { href: "/lessons", label: "Lessons" },
     { href: "/forums", label: "Forums" },
   ];
@@ -23,7 +22,7 @@ export function MainNav() {
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <BookOpen className="h-6 w-6 text-primary" />
             <span className="hidden font-bold sm:inline-block">
-              UK MERIT ACADEMY
+              UK MERIT ACADEMY (PVT) LTD
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
@@ -54,7 +53,7 @@ export function MainNav() {
                   className="flex items-center space-x-2"
                 >
                   <BookOpen className="h-6 w-6 text-primary" />
-                  <span className="font-bold">UK MERIT ACADEMY</span>
+                  <span className="font-bold">UK MERIT ACADEMY (PVT) LTD</span>
                 </Link>
                 <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                   <div className="flex flex-col space-y-3">
@@ -74,7 +73,7 @@ export function MainNav() {
 
         <Link href="/" className="flex items-center space-x-2 md:hidden">
           <BookOpen className="h-6 w-6 text-primary" />
-          <span className="font-bold">UK MERIT ACADEMY</span>
+          <span className="font-bold">UK MERIT ACADEMY (PVT) LTD</span>
         </Link>
         
         <div className="flex flex-1 items-center justify-end space-x-2">

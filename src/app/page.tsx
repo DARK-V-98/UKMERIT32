@@ -1,7 +1,7 @@
 import { MainNav } from '@/components/layout/main-nav';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { HeroSection } from '@/components/landing/hero-section';
-import { FeaturesSection } from '@/components/landing/features-section';
+import { FeaturedLessons } from '@/components/landing/featured-lessons';
 import { CtaSection } from '@/components/landing/cta-section';
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
       <MainNav />
       <main className="flex-1">
         <HeroSection />
-        <FeaturesSection />
+        <FeaturedLessons />
         <CtaSection />
       </main>
       <SiteFooter />
