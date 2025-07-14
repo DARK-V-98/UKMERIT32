@@ -30,17 +30,9 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists() && userDoc.data().profileComplete) {
-        router.push("/dashboard");
-      } else {
-        router.push("/complete-profile");
-      }
+      await signInWithEmailAndPassword(auth, email, password);
+      // The AuthProvider will handle the redirect
+      router.push("/dashboard"); 
 
     } catch (error: any) {
       toast({
@@ -65,21 +57,16 @@ export default function LoginPage() {
       const userDoc = await getDoc(userDocRef);
 
       if (additionalUserInfo?.isNewUser || !userDoc.exists()) {
-        // New user, create doc and redirect to complete profile
         await setDoc(userDocRef, {
             uid: user.uid,
             fullName: user.displayName,
             email: user.email,
             role: "user",
             createdAt: new Date(),
-            profileComplete: false, // Flag for profile completion
+            profileComplete: false,
           }, { merge: true });
         router.push("/complete-profile");
-      } else if (userDoc.exists() && !userDoc.data().profileComplete) {
-        // Existing user but profile is not complete
-        router.push("/complete-profile");
       } else {
-        // Existing user with complete profile
         router.push("/dashboard");
       }
 

@@ -36,14 +36,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setIsAdmin(user?.email === ADMIN_EMAIL);
-
+      
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          setProfileComplete(userDoc.data().profileComplete);
-        } else {
-          setProfileComplete(false);
-        }
+        setProfileComplete(userDoc.exists() && userDoc.data().profileComplete);
       } else {
         setProfileComplete(undefined);
       }
@@ -69,24 +65,33 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (loading) return;
+    if (loading) return; // Wait until auth state is determined
 
-    // If not logged in, redirect to login page unless they are already there or on an allowed public page.
+    const isAuthPage = ['/login', '/signup', '/'].includes(pathname);
+    const isPublicPage = pathname.startsWith('/lessons/');
+    const isProfileCompletionPage = pathname === '/complete-profile';
+
     if (!user) {
-      if (!['/login', '/signup', '/'].includes(pathname) && !pathname.startsWith('/lessons/')) {
+      if (!isAuthPage && !isPublicPage) {
         router.push('/login');
       }
       return;
     }
 
-    // If logged in but profile is not complete, redirect to complete-profile page.
-    if (user && !profileComplete && pathname !== '/complete-profile') {
+    // If user is logged in, but profile is not complete, and they are not on the completion page
+    if (profileComplete === false && !isProfileCompletionPage) {
         router.push('/complete-profile');
+    }
+
+    // If user is logged in, profile is complete, but they are trying to access login/signup
+    if (profileComplete === true && (isAuthPage || isProfileCompletionPage)) {
+      router.push('/dashboard');
     }
 
   }, [user, loading, profileComplete, router, pathname]);
 
-  if (loading || (!user && !['/login', '/signup', '/'].includes(pathname) && !pathname.startsWith('/lessons/')) ) {
+  // Show a loading skeleton while we verify auth, or if we're about to redirect.
+  if (loading || (!user && !['/login', '/signup', '/'].includes(pathname) && !pathname.startsWith('/lessons/')) || (user && profileComplete === false && pathname !== '/complete-profile')) {
     return (
        <div className="container py-8">
          <div className="space-y-8">

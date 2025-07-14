@@ -6,9 +6,9 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { doc, getDoc, setDoc } from "firebase/firestore"
+import { doc, setDoc } from "firebase/firestore"
 import { auth, db } from "@/lib/firebase"
-import { onAuthStateChanged, User } from "firebase/auth"
+import { User } from "firebase/auth"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useAuth } from "@/app/(app)/layout"
 
 const formSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters." }),
@@ -31,27 +32,9 @@ const formSchema = z.object({
 export default function CompleteProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        // Check if profile is already complete
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (userDoc.exists() && userDoc.data().profileComplete) {
-          router.push("/dashboard");
-        } else {
-          setLoading(false);
-        }
-      } else {
-        router.push("/login");
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
-
+  const { user, loading: authLoading, profileComplete } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,12 +43,23 @@ export default function CompleteProfilePage() {
     }
   });
 
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.push("/login");
+      } else if (profileComplete) {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, authLoading, profileComplete, router]);
+
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user) {
       toast({ title: "Error", description: "You are not logged in.", variant: "destructive" });
       return;
     }
-    setLoading(true);
+    setIsSubmitting(true);
     try {
       await setDoc(doc(db, "users", user.uid), {
         username: values.username,
@@ -74,7 +68,11 @@ export default function CompleteProfilePage() {
       }, { merge: true });
 
       toast({ title: "Success", description: "Your profile has been updated." });
+      // Manually push to dashboard, the context will take a moment to update
       router.push("/dashboard");
+      // Force a reload to ensure the AuthProvider picks up the new profile state
+      router.refresh(); 
+
     } catch (error: any) {
       toast({
         title: "Update Failed",
@@ -82,11 +80,11 @@ export default function CompleteProfilePage() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
   
-  if (loading || !user) {
+  if (authLoading || profileComplete === undefined) {
     return (
        <Card className="mx-auto max-w-sm w-full">
         <CardHeader>
@@ -113,7 +111,7 @@ export default function CompleteProfilePage() {
       <CardHeader>
         <CardTitle className="text-xl">Complete Your Profile</CardTitle>
         <CardDescription>
-          Welcome, {user.displayName}! Please add a few more details to finish setting up your account.
+          Welcome, {user?.displayName}! Please add a few more details to finish setting up your account.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -126,7 +124,7 @@ export default function CompleteProfilePage() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Create a username" {...field} disabled={loading} />
+                    <Input placeholder="Create a username" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -139,14 +137,14 @@ export default function CompleteProfilePage() {
                 <FormItem>
                   <FormLabel>WhatsApp Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="070 123 4567" {...field} disabled={loading} />
+                    <Input placeholder="070 123 4567" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Saving..." : "Save and Continue"}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save and Continue"}
             </Button>
           </form>
         </Form>
