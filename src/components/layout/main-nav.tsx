@@ -1,4 +1,5 @@
 
+
 "use client"
 import Link from "next/link"
 import Image from "next/image"
@@ -11,6 +12,10 @@ import {
 } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { auth } from "@/lib/firebase"
+import { signOut } from "firebase/auth"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   const navLinks = [
@@ -109,22 +114,43 @@ export function MainNav({ isAuthenticated = false }: { isAuthenticated?: boolean
 
 
 function UserMenu() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const user = auth.currentUser;
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/");
+       toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Logout Failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9 border">
-            <AvatarImage src="https://placehold.co/100x100.png" alt="@student" data-ai-hint="person face" />
-            <AvatarFallback>S</AvatarFallback>
+            <AvatarImage src={user?.photoURL || "https://placehold.co/100x100.png"} alt={user?.displayName || "User"} data-ai-hint="person face" />
+            <AvatarFallback>{user?.displayName?.[0] || user?.email?.[0] || 'U'}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Alex Turner</p>
+            <p className="text-sm font-medium leading-none">{user?.displayName || "User"}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              alex.t@example.com
+              {user?.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -138,11 +164,9 @@ function UserMenu() {
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </Link>
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
