@@ -25,7 +25,7 @@ export function HeroSection() {
         </div>
         <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
            <Image 
-            src="https://placehold.co/800x450.png"
+            src="/ln.webp"
             alt="An illustration of people learning"
             layout="fill"
             objectFit="cover"
