@@ -41,7 +41,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarHeader>
             <Link href="/dashboard" className="flex items-center gap-2">
               <BookOpen className="h-7 w-7 text-primary" />
-              <span className="text-xl font-bold tracking-tighter text-foreground">Verbal Voyage</span>
+              <span className="text-lg font-bold tracking-tighter text-foreground">UK MERIT ACADEMY</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>

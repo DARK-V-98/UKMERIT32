@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Verbal Voyage',
-  description: 'Master English with engaging video lessons and interactive quizzes.',
+  title: 'UK MERIT ACADEMY (PVT) LTD',
+  description: 'Your partner in education and professional development.',
 };
 
 export default function RootLayout({

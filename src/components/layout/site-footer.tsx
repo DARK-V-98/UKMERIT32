@@ -9,10 +9,10 @@ export function SiteFooter() {
           <div className="flex flex-col items-start gap-4">
             <Link href="/" className="flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">Verbal Voyage</span>
+              <span className="text-lg font-bold">UK MERIT ACADEMY</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Master English with engaging video lessons and interactive quizzes.
+              Your partner in education and professional development.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-muted-foreground hover:text-foreground"><Twitter /></Link>
@@ -47,7 +47,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Verbal Voyage. All rights reserved.
+          © {new Date().getFullYear()} UK MERIT ACADEMY (PVT) LTD. All rights reserved.
         </div>
       </div>
     </footer>
