@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ParticleButton } from "@/components/ui/particle-button"
 
 export default function SignupPage() {
   return (
@@ -40,9 +39,9 @@ export default function SignupPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" />
           </div>
-           <ParticleButton asChild>
+           <Button asChild>
             <Link href="/dashboard" className="w-full text-center">Create an account</Link>
-          </ParticleButton>
+          </Button>
           <Button variant="outline" className="w-full">
             Sign up with Google
           </Button>

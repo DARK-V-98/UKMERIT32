@@ -1,7 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ParticleButton } from "../ui/particle-button"
 
 export function HeroSection() {
   return (
@@ -17,9 +16,9 @@ export function HeroSection() {
             interactive quizzes, and a supportive community of learners.
           </p>
           <div className="mt-8 flex justify-center lg:justify-start gap-4">
-            <ParticleButton size="lg" asChild>
+            <Button size="lg" asChild>
               <Link href="/signup">Get Started for Free</Link>
-            </ParticleButton>
+            </Button>
             <Button size="lg" variant="outline" asChild>
               <Link href="/lessons">Explore Lessons</Link>
             </Button>

@@ -8,7 +8,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { ParticleButton } from "../ui/particle-button"
 
 export function MainNav() {
   const navLinks = [
@@ -43,9 +42,11 @@ export function MainNav() {
         {/* Mobile Nav */}
         <div className="md:hidden">
             <Sheet>
-              <SheetTrigger className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
+              <SheetTrigger asChild>
+                <Button variant="ghost" className="px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
               </SheetTrigger>
               <SheetContent side="left" className="pr-0">
                  <Link
@@ -80,9 +81,9 @@ export function MainNav() {
           <Button variant="ghost" asChild>
             <Link href="/login">Login</Link>
           </Button>
-          <ParticleButton asChild>
+          <Button asChild>
             <Link href="/signup">Sign up</Link>
-          </ParticleButton>
+          </Button>
         </div>
       </div>
     </header>

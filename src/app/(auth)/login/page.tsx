@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ParticleButton } from "@/components/ui/particle-button"
 
 export default function LoginPage() {
   return (
@@ -44,9 +43,9 @@ export default function LoginPage() {
             </div>
             <Input id="password" type="password" required />
           </div>
-          <ParticleButton asChild>
+          <Button asChild>
             <Link href="/dashboard" className="w-full text-center">Login</Link>
-          </ParticleButton>
+          </Button>
           <Button variant="outline" className="w-full">
             Login with Google
           </Button>

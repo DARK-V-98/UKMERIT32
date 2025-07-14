@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { PlayCircle, FileText } from "lucide-react"
-import { ParticleButton } from "@/components/ui/particle-button"
+import { Button } from "@/components/ui/button"
 
 export default function LessonDetailPage({ params }: { params: { id: string } }) {
   const lesson = lessons.find(l => l.id === params.id)
@@ -42,11 +42,11 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
         </Card>
         
         <div className="flex justify-center">
-          <ParticleButton size="lg" asChild>
+          <Button size="lg" asChild>
             <Link href={`/lessons/${lesson.id}/quiz`}>
               Take Quiz & Test Your Knowledge
             </Link>
-          </ParticleButton>
+          </Button>
         </div>
 
         <Card>

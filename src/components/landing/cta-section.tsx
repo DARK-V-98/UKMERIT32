@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ParticleButton } from "../ui/particle-button"
+import { Button } from "../ui/button"
 
 export function CtaSection() {
   return (
@@ -12,9 +12,9 @@ export function CtaSection() {
           Create your free account today and take the first step towards English fluency.
         </p>
         <div className="mt-8">
-          <ParticleButton size="lg" asChild>
+          <Button size="lg" asChild>
             <Link href="/signup">Start Learning Now</Link>
-          </ParticleButton>
+          </Button>
         </div>
       </div>
     </section>

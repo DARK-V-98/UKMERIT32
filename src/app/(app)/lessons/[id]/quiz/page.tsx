@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { CheckCircle2, XCircle, Award } from "lucide-react"
-import { ParticleButton } from "@/components/ui/particle-button"
 
 export default function QuizPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -66,7 +65,7 @@ export default function QuizPage({ params }: { params: { id: string } }) {
               <p className="text-muted-foreground">You answered {score} out of {quiz.questions.length} questions correctly.</p>
               <div className="flex gap-4">
                 <Button variant="outline" className="w-full" onClick={() => router.back()}>Back to Lesson</Button>
-                <ParticleButton className="w-full" onClick={() => router.push('/lessons')}>Explore More Lessons</ParticleButton>
+                <Button className="w-full" onClick={() => router.push('/lessons')}>Explore More Lessons</Button>
               </div>
             </CardContent>
         </Card>
@@ -116,7 +115,7 @@ export default function QuizPage({ params }: { params: { id: string } }) {
           {currentQuestionIndex < quiz.questions.length - 1 ? (
              <Button onClick={handleNext} disabled={!selectedAnswers[currentQuestionIndex]}>Next</Button>
           ) : (
-            <ParticleButton onClick={handleSubmit} disabled={!selectedAnswers[currentQuestionIndex]}>Finish Quiz</ParticleButton>
+            <Button onClick={handleSubmit} disabled={!selectedAnswers[currentQuestionIndex]}>Finish Quiz</Button>
           )}
         </div>
       </div>
