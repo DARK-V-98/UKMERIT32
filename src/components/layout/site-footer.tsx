@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Twitter, Github, Linkedin } from "lucide-react";
+import { BookOpen, Youtube, Facebook, Mail, Phone } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -15,9 +15,8 @@ export function SiteFooter() {
               Your partner in education and professional development.
             </p>
             <div className="flex gap-4">
-              <Link href="#" className="text-muted-foreground hover:text-secondary"><Twitter /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-secondary"><Github /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-secondary"><Linkedin /></Link>
+              <Link href="https://www.youtube.com/@FreeEnglishinSinhala" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary"><Youtube /></Link>
+              <Link href="https://www.facebook.com/FreeEnglishSinhala?mibextid=ZbWKwL" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary"><Facebook /></Link>
             </div>
           </div>
           <div className="md:col-start-3 grid grid-cols-2 md:grid-cols-3 gap-8">
@@ -30,11 +29,10 @@ export function SiteFooter() {
                   </ul>
               </div>
               <div>
-                  <h4 className="font-semibold mb-4">Company</h4>
+                  <h4 className="font-semibold mb-4">Contact Us</h4>
                   <ul className="space-y-2">
-                      <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">About Us</Link></li>
-                      <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Careers</Link></li>
-                      <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Contact</Link></li>
+                      <li><a href="mailto:Fesappmail@gmail.com" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"><Mail className="h-4 w-4"/>Email</a></li>
+                      <li><a href="https://wa.me/702210310" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"><Phone className="h-4 w-4"/>WhatsApp</a></li>
                   </ul>
               </div>
                <div>
