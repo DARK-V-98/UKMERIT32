@@ -16,7 +16,26 @@ const chartData = [
 const chartConfig = {
   score: {
     label: "Score",
-    color: "hsl(var(--primary))",
+  },
+  tenses: {
+    label: "Tenses",
+    color: "hsl(var(--chart-1))",
+  },
+  nouns: {
+    label: "Nouns",
+    color: "hsl(var(--chart-2))",
+  },
+  verbs: {
+    label: "Verbs",
+    color: "hsl(var(--chart-3))",
+  },
+   adjectives: {
+    label: "Adjectives",
+    color: "hsl(var(--chart-4))",
+  },
+  adverbs: {
+    label: "Adverbs",
+    color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig;
 
@@ -32,7 +51,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Lessons Completed</CardTitle>
-            <BookCheck className="h-4 w-4 text-muted-foreground" />
+            <BookCheck className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12 / 50</div>
@@ -42,7 +61,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-4 w-4 text-secondary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">88%</div>
@@ -52,7 +71,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Top Skill</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <Star className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Vocabulary</div>
@@ -62,7 +81,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Time Spent (Weekly)</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Clock className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">4h 32m</div>
@@ -88,7 +107,11 @@ export default function DashboardPage() {
                 tickFormatter={(value) => value.slice(0, 8)}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="score" fill="var(--color-score)" radius={4} />
+              <Bar dataKey="score" radius={4}>
+                 {chartData.map((entry, index) => (
+                    <div key={`cell-${index}`}  />
+                  ))}
+              </Bar>
             </BarChart>
           </ChartContainer>
         </CardContent>

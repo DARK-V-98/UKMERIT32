@@ -15,9 +15,9 @@ export function SiteFooter() {
               Your partner in education and professional development.
             </p>
             <div className="flex gap-4">
-              <Link href="#" className="text-muted-foreground hover:text-foreground"><Twitter /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-foreground"><Github /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-foreground"><Linkedin /></Link>
+              <Link href="#" className="text-muted-foreground hover:text-secondary"><Twitter /></Link>
+              <Link href="#" className="text-muted-foreground hover:text-secondary"><Github /></Link>
+              <Link href="#" className="text-muted-foreground hover:text-secondary"><Linkedin /></Link>
             </div>
           </div>
           <div className="md:col-start-3 grid grid-cols-2 md:grid-cols-3 gap-8">
