@@ -8,14 +8,14 @@ export function HeroSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="text-center lg:text-left">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            <span className="block text-primary">Achieve Your</span>
+            <span className="block text-accent">Achieve Your</span>
             <span className="block text-secondary">Full Potential.</span>
           </h1>
           <p className="mt-3 max-w-md mx-auto text-lg text-muted-foreground sm:text-xl md:mt-5 md:max-w-3xl">
             Join UK MERIT ACADEMY for engaging video lessons, interactive quizzes, and a supportive community of learners.
           </p>
           <div className="mt-8 flex justify-center lg:justify-start gap-4">
-            <Button size="lg" asChild>
+            <Button size="lg" asChild variant="destructive">
               <Link href="/signup">Get Started for Free</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
