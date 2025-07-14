@@ -4,9 +4,9 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "firebase/auth"
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, getAdditionalUserInfo } from "firebase/auth"
 import { auth, db } from "@/lib/firebase"
-import { setDoc, doc } from "firebase/firestore"
+import { setDoc, doc, getDoc } from "firebase/firestore"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -73,6 +73,7 @@ export default function SignupPage() {
         whatsapp: values.whatsapp,
         role: "user", // Assign a default role
         createdAt: new Date(),
+        profileComplete: true, // Profile is complete with email signup
       });
 
       router.push("/dashboard");
@@ -93,18 +94,26 @@ export default function SignupPage() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      const additionalUserInfo = getAdditionalUserInfo(result);
+      
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-      // Check if user already exists in Firestore before creating a new doc
-      // For simplicity, we'll create or overwrite. In a real app, you might merge.
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        fullName: user.displayName,
-        email: user.email,
-        role: "user",
-        createdAt: new Date(),
-      }, { merge: true }); // Use merge to avoid overwriting data if user exists
-
-      router.push("/dashboard");
+      if (additionalUserInfo?.isNewUser || !userDoc.exists()) {
+        // New user, create doc and redirect to complete profile
+        await setDoc(userDocRef, {
+            uid: user.uid,
+            fullName: user.displayName,
+            email: user.email,
+            role: "user",
+            createdAt: new Date(),
+            profileComplete: false, // Flag for profile completion
+          }, { merge: true });
+        router.push("/complete-profile");
+      } else {
+        // Existing user
+        router.push("/dashboard");
+      }
     } catch (error: any) {
        toast({
         title: "Google Sign-In Failed",

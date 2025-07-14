@@ -4,8 +4,9 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
-import { auth } from "@/lib/firebase"
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from "firebase/auth"
+import { auth, db } from "@/lib/firebase"
+import { doc, getDoc, setDoc } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -46,8 +47,29 @@ export default function LoginPage() {
     const provider = new GoogleAuthProvider();
     setLoading(true);
     try {
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const additionalUserInfo = getAdditionalUserInfo(result);
+      
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (additionalUserInfo?.isNewUser || !userDoc.exists()) {
+        // New user, create doc and redirect to complete profile
+        await setDoc(userDocRef, {
+            uid: user.uid,
+            fullName: user.displayName,
+            email: user.email,
+            role: "user",
+            createdAt: new Date(),
+            profileComplete: false, // Flag for profile completion
+          }, { merge: true });
+        router.push("/complete-profile");
+      } else {
+        // Existing user
+        router.push("/dashboard");
+      }
+
     } catch (error: any) {
        toast({
         title: "Google Sign-In Failed",
