@@ -1,10 +1,11 @@
 
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { Users, BookOpen, MessageSquare, CheckCircle } from "lucide-react";
+import { Users, BookOpen, MessageSquare, CheckCircle, ArrowRight } from "lucide-react";
 import { siteStats, users } from "@/lib/mock-data";
 import { Button } from "../ui/button";
 
@@ -68,6 +69,48 @@ export default function AdminDashboard() {
         </Card>
       </div>
       
+       <Card>
+        <CardHeader>
+            <CardTitle>Admin Tools</CardTitle>
+            <CardDescription>Quick links to manage your platform.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button asChild variant="outline" className="justify-start text-left h-auto py-4">
+                <Link href="/admin/courses">
+                    <div className="flex items-start gap-4">
+                        <BookOpen className="h-6 w-6 text-primary mt-1" />
+                        <div>
+                            <p className="font-semibold">Manage Courses</p>
+                            <p className="text-sm text-muted-foreground">Add, edit, and structure courses.</p>
+                        </div>
+                    </div>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" className="justify-start text-left h-auto py-4">
+                 <Link href="/admin/users">
+                     <div className="flex items-start gap-4">
+                        <Users className="h-6 w-6 text-primary mt-1" />
+                        <div>
+                            <p className="font-semibold">Manage Users</p>
+                            <p className="text-sm text-muted-foreground">View users and manage roles.</p>
+                        </div>
+                    </div>
+                </Link>
+            </Button>
+             <Button asChild variant="outline" className="justify-start text-left h-auto py-4">
+                 <Link href="/admin/settings">
+                     <div className="flex items-start gap-4">
+                        <MessageSquare className="h-6 w-6 text-primary mt-1" />
+                        <div>
+                            <p className="font-semibold">Manage Forums</p>
+                            <p className="text-sm text-muted-foreground">Moderate discussions.</p>
+                        </div>
+                    </div>
+                </Link>
+            </Button>
+        </CardContent>
+       </Card>
+
       <div className="grid gap-8 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -90,69 +133,39 @@ export default function AdminDashboard() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Platform Health</CardTitle>
-             <CardDescription>Key metrics for the last 30 days.</CardDescription>
+            <CardTitle>Recent Users</CardTitle>
+            <CardDescription>A list of the newest users on the platform.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4">
-             <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Server Uptime</p>
-                <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">99.98%</Badge>
-             </div>
-             <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Average Response Time</p>
-                <p className="font-semibold">120ms</p>
-             </div>
-             <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Error Rate</p>
-                <p className="font-semibold">0.02%</p>
-             </div>
-             <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">New Issues Reported</p>
-                <p className="font-semibold">3</p>
-             </div>
-             <div className="pt-4">
-                <Button variant="outline" className="w-full">View System Status Page</Button>
-             </div>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead className="hidden md:table-cell">Email</TableHead>
+                  <TableHead className="text-right">Enrolled</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.slice(0, 5).map(user => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarImage src={user.avatar} alt={user.name} />
+                          <AvatarFallback>{user.name?.[0] || user.email?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{user.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">{user.email}</TableCell>
+                    <TableCell className="text-right">{user.enrolled}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Users</CardTitle>
-          <CardDescription>A list of the newest users on the platform.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Enrollment Date</TableHead>
-                <TableHead className="text-right">Progress</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.slice(0, 5).map(user => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{user.name?.[0] || user.email?.[0] || 'U'}</AvatarFallback>
-                      </Avatar>
-                      <span className="font-medium">{user.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.enrolled}</TableCell>
-                  <TableCell className="text-right">{user.progress}%</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   )
 }
