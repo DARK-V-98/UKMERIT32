@@ -10,7 +10,7 @@
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 45 88% 53%; /* Gold from logo */
+    --primary: 48 89% 70%; /* Gold from logo */
     --primary-foreground: 224 71.4% 4.1%;
     --secondary: 220 75% 35%; /* Blue from logo */
     --secondary-foreground: 0 0% 98%;
@@ -23,7 +23,7 @@
     --border: 220 13% 88%;
     --input: 220 13% 91%;
     --ring: 220 75% 35%; /* Blue from logo */
-    --chart-1: 45 88% 53%; /* Gold */
+    --chart-1: 48 89% 70%; /* Gold */
     --chart-2: 220 75% 45%; /* Blue */
     --chart-3: 0 84.2% 60.2%; /* Red */
     --chart-4: 43 74% 66%;
@@ -31,12 +31,12 @@
     --radius: 0.5rem;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 224 71.4% 4.1%;
-    --sidebar-primary: 45 88% 53%;
+    --sidebar-primary: 48 89% 70%;
     --sidebar-primary-foreground: 224 71.4% 4.1%;
     --sidebar-accent: 0 0% 94.1%;
     --sidebar-accent-foreground: 224 71.4% 4.1%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 45 88% 53%;
+    --sidebar-ring: 48 89% 70%;
   }
   .dark {
     --background: 224 71.4% 4.1%;
@@ -45,7 +45,7 @@
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
-    --primary: 45 88% 53%;
+    --primary: 48 89% 70%;
     --primary-foreground: 224 71.4% 4.1%;
     --secondary: 220 75% 55%;
     --secondary-foreground: 210 20% 98%;
@@ -58,19 +58,19 @@
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
     --ring: 220 75% 55%;
-    --chart-1: 45 88% 53%;
+    --chart-1: 48 89% 70%;
     --chart-2: 220 75% 55%;
     --chart-3: 0 84.2% 70.2%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --sidebar-background: 224 71.4% 4.1%;
     --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 45 88% 53%;
+    --sidebar-primary: 48 89% 70%;
     --sidebar-primary-foreground: 224 71.4% 4.1%;
     --sidebar-accent: 215 27.9% 16.9%;
     --sidebar-accent-foreground: 210 20% 98%;
     --sidebar-border: 215 27.9% 16.9%;
-    --sidebar-ring: 45 88% 53%;
+    --sidebar-ring: 48 89% 70%;
   }
 }
 
