@@ -4,7 +4,8 @@ import { courses, lessons as allLessons } from "@/lib/mock-data"
 import { notFound } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PlayCircle, CheckCircle } from "lucide-react"
+import { PlayCircle, BookOpen } from "lucide-react"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 export default function CourseDetailPage({ params }: { params: { id: string } }) {
   const course = courses.find(c => c.id === params.id)
@@ -14,6 +15,16 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
   }
 
   const courseLessons = allLessons.filter(lesson => course.lessonIds.includes(lesson.id));
+  
+  const lessonsByCategory = courseLessons.reduce((acc, lesson) => {
+    const category = lesson.category || "General";
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(lesson);
+    return acc;
+  }, {} as Record<string, typeof courseLessons>);
+
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -47,28 +58,40 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
         <Card>
           <CardHeader>
-            <CardTitle>Course Lessons</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen />
+              Course Content
+            </CardTitle>
             <CardDescription>All the lessons included in the "{course.title}" course.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {courseLessons.map((lesson, index) => (
-                <li key={lesson.id} className="flex items-center gap-4">
-                  <div className="flex-shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="font-semibold">{lesson.title}</h4>
-                    <p className="text-sm text-muted-foreground">{lesson.duration}</p>
-                  </div>
-                  <Button asChild variant="ghost" size="icon">
-                    <Link href={`/lessons/${lesson.id}`}>
-                      <PlayCircle className="h-6 w-6" />
-                    </Link>
-                  </Button>
-                </li>
+            <Accordion type="multiple" defaultValue={Object.keys(lessonsByCategory)} className="w-full">
+              {Object.entries(lessonsByCategory).map(([category, lessons]) => (
+                <AccordionItem value={category} key={category}>
+                  <AccordionTrigger className="text-lg font-semibold">{category}</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-4 pt-2">
+                      {lessons.map((lesson, index) => (
+                        <li key={lesson.id} className="flex items-center gap-4">
+                          <div className="flex-shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold">
+                            {index + 1}
+                          </div>
+                          <div className="flex-grow">
+                            <h4 className="font-semibold">{lesson.title}</h4>
+                            <p className="text-sm text-muted-foreground">{lesson.duration}</p>
+                          </div>
+                          <Button asChild variant="ghost" size="icon">
+                            <Link href={`/lessons/${lesson.id}`}>
+                              <PlayCircle className="h-6 w-6" />
+                            </Link>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </ul>
+            </Accordion>
           </CardContent>
         </Card>
 
