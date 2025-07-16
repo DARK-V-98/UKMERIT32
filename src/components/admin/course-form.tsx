@@ -19,6 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Course } from "@/lib/types";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -30,18 +31,36 @@ interface CourseFormProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   course?: Course;
+  onClose?: () => void;
 }
 
-export function CourseForm({ isOpen, setIsOpen, course }: CourseFormProps) {
+export function CourseForm({ isOpen, setIsOpen, course, onClose }: CourseFormProps) {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: course?.title || "",
-      description: course?.description || "",
-      thumbnailUrl: course?.thumbnailUrl || "",
+      title: "",
+      description: "",
+      thumbnailUrl: "",
     },
   });
+
+  useEffect(() => {
+    if (isOpen && course) {
+      form.reset({
+        title: course.title,
+        description: course.description,
+        thumbnailUrl: course.thumbnailUrl,
+      });
+    } else {
+       form.reset({
+        title: "",
+        description: "",
+        thumbnailUrl: "",
+      });
+    }
+  }, [isOpen, course, form]);
+
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -61,6 +80,7 @@ export function CourseForm({ isOpen, setIsOpen, course }: CourseFormProps) {
       }
       form.reset();
       setIsOpen(false);
+      onClose?.();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -71,7 +91,12 @@ export function CourseForm({ isOpen, setIsOpen, course }: CourseFormProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          onClose?.();
+        }
+    }}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{course ? "Edit Course" : "Add New Course"}</DialogTitle>
@@ -114,7 +139,7 @@ export function CourseForm({ isOpen, setIsOpen, course }: CourseFormProps) {
                 <FormItem>
                   <FormLabel>Image Filename</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., course-image (without .png)" {...field} />
+                    <Input placeholder="e.g., course-image (without .png extension)" {...field} />
                   </FormControl>
                    <FormMessage />
                 </FormItem>
