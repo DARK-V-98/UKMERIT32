@@ -130,6 +130,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
 
       const dataToSave = {
         ...values,
+        courseId: values.courseId === 'none' ? '' : values.courseId,
         thumbnailUrl: values.thumbnailUrl || "https://placehold.co/400x225.png"
       }
 
@@ -143,8 +144,8 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
           createdAt: new Date(),
         });
         
-        if (values.courseId) {
-            const courseRef = doc(db, "courses", values.courseId);
+        if (dataToSave.courseId) {
+            const courseRef = doc(db, "courses", dataToSave.courseId);
             await updateDoc(courseRef, {
                 lessonIds: arrayUnion(lessonRef.id)
             });
@@ -239,14 +240,14 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Course (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ''} defaultValue={field.value || ''}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Assign to a course" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {courses.map(course => (
                               <SelectItem key={course.value} value={course.value}>{course.label}</SelectItem>
                           ))}
