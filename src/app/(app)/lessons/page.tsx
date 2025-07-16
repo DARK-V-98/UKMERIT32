@@ -51,13 +51,18 @@ export default function LessonsPage() {
     fetchLessons();
   }, []);
 
-  const categories = useMemo(() => [...new Set(allLessons.map(l => l.category).filter(Boolean))], [allLessons]);
+  const categories = useMemo(() => {
+    const lessonCategories = allLessons
+      .map(l => l.category)
+      .filter(c => typeof c === 'string' && c.length > 0); // Ensure category is a non-empty string
+    return [...new Set(lessonCategories)];
+  }, [allLessons]);
 
   const filteredLessons = useMemo(() => {
     return allLessons
       .filter(lesson =>
-        lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lesson.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (lesson.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (lesson.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
       .filter(lesson => (category ? lesson.category === category : true))
       .filter(lesson => (difficulty ? lesson.difficulty === difficulty : true));
