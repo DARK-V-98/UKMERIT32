@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react"
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { notFound, useRouter } from "next/navigation"
+import { notFound, useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -14,8 +14,10 @@ import { CheckCircle2, XCircle, Award } from "lucide-react"
 import type { Lesson, Quiz } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function QuizPage({ params }: { params: { id: string } }) {
+export default function QuizPage() {
   const router = useRouter();
+  const params = useParams();
+  const lessonId = Array.isArray(params.id) ? params.id[0] : params.id;
   
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -27,10 +29,12 @@ export default function QuizPage({ params }: { params: { id: string } }) {
   const [score, setScore] = useState(0)
 
   useEffect(() => {
+    if (!lessonId) return;
+
     const fetchQuizData = async () => {
       setLoading(true);
-      const lessonRef = doc(db, 'lessons', params.id);
-      const quizRef = doc(db, 'quizzes', params.id);
+      const lessonRef = doc(db, 'lessons', lessonId);
+      const quizRef = doc(db, 'quizzes', lessonId);
 
       const [lessonSnap, quizSnap] = await Promise.all([
         getDoc(lessonRef),
@@ -52,7 +56,7 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     };
 
     fetchQuizData();
-  }, [params.id]);
+  }, [lessonId]);
 
   if (loading) {
     return (
