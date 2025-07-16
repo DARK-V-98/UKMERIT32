@@ -3,6 +3,7 @@ import { SiteFooter } from '@/components/layout/site-footer';
 import { HeroSection } from '@/components/landing/hero-section';
 import { CtaSection } from '@/components/landing/cta-section';
 import { FeaturedCourses } from '@/components/landing/featured-courses';
+import { AboutSection } from '@/components/landing/about-section';
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <main className="flex-1">
         <HeroSection />
         <FeaturedCourses />
+        <AboutSection />
         <CtaSection />
       </main>
       <SiteFooter />
