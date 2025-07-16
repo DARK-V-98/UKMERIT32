@@ -29,6 +29,11 @@ interface ComboboxProps {
 
 export function Combobox({ options, value, onChange, placeholder }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
+  const [inputValue, setInputValue] = React.useState("")
+
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(inputValue.toLowerCase())
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,37 +52,38 @@ export function Combobox({ options, value, onChange, placeholder }: ComboboxProp
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
-          <CommandInput placeholder="Search or create..." />
+          <CommandInput 
+            placeholder="Search or create..."
+            value={inputValue}
+            onValueChange={setInputValue}
+          />
            <CommandList>
                 <CommandEmpty>
                     <Button
                         variant="ghost"
                         className="w-full"
                         onClick={() => {
-                            const inputValue = (document.querySelector(
-                            '[cmdk-input]'
-                            ) as HTMLInputElement)?.value;
                             onChange(inputValue);
                             setOpen(false);
                         }}
                     >
-                       Create "{ (document.querySelector('[cmdk-input]') as HTMLInputElement)?.value }"
+                       Create "{inputValue}"
                     </Button>
                 </CommandEmpty>
                 <CommandGroup>
-                {options.map((option) => (
+                {filteredOptions.map((option) => (
                     <CommandItem
                     key={option.value}
                     value={option.value}
                     onSelect={(currentValue) => {
-                        onChange(currentValue === value ? "" : currentValue)
+                        onChange(currentValue.toLowerCase() === value.toLowerCase() ? "" : option.value)
                         setOpen(false)
                     }}
                     >
                     <Check
                         className={cn(
                         "mr-2 h-4 w-4",
-                        value === option.value ? "opacity-100" : "opacity-0"
+                        value.toLowerCase() === option.value.toLowerCase() ? "opacity-100" : "opacity-0"
                         )}
                     />
                     {option.label}
