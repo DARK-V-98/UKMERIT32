@@ -58,5 +58,3 @@ export interface UserProgress {
     completed: boolean;
     completedAt: Timestamp;
 }
-
-    

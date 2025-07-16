@@ -111,6 +111,12 @@ export default function UserDashboard() {
 
   }, [user]);
 
+   const getImageUrl = (thumbnailUrl?: string) => {
+    if (!thumbnailUrl) return "https://placehold.co/120x67.png";
+    if (thumbnailUrl.startsWith('http')) return thumbnailUrl;
+    return `/${thumbnailUrl}.png`;
+  }
+
   if (loading) {
     return (
         <div className="space-y-8">
@@ -224,7 +230,7 @@ export default function UserDashboard() {
               {continueLearning ? (
                  <Link href={`/lessons/${continueLearning.id}`} className="flex items-start gap-4 group">
                     <Image 
-                      src={continueLearning.thumbnailUrl || "https://placehold.co/120x67.png"}
+                      src={getImageUrl(continueLearning.thumbnailUrl)}
                       alt={continueLearning.title}
                       width={120}
                       height={67}
@@ -249,5 +255,3 @@ export default function UserDashboard() {
     </div>
   )
 }
-
-    

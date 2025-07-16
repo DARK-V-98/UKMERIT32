@@ -112,8 +112,8 @@ export default function LessonDetailPage() {
                   <Image 
                     src={lesson.thumbnailUrl || "https://placehold.co/854x480.png"} 
                     alt={lesson.title}
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    className="object-cover"
                     data-ai-hint={lesson.imageHint || 'lesson placeholder'}
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">

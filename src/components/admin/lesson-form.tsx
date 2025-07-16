@@ -34,12 +34,12 @@ import { CategoryForm } from "./category-form";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
-  description: z.string().min(10, "Description must be at least 10 characters."),
+  description: z.string().min(10, "Description must be at least 10 characters.").optional().or(z.literal('')),
   category: z.string().min(1, "Please select or create a category."),
   difficulty: z.string().min(1, "Please select a difficulty."),
   duration: z.string().min(1, "Please enter a duration."),
   videoUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
-  thumbnailUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
+  thumbnailUrl: z.string().optional(),
   status: z.enum(['active', 'disabled'])
 });
 
@@ -58,11 +58,11 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: lesson || {
+    defaultValues: {
       title: "",
       description: "",
       category: "",
-      difficulty: "",
+      difficulty: "Beginner",
       duration: "",
       videoUrl: "",
       thumbnailUrl: "",
@@ -84,10 +84,14 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
     }
   }, [isOpen]);
 
-  // This effect updates the form with new `lesson` data when it changes.
   React.useEffect(() => {
     if (lesson) {
-      form.reset(lesson);
+      form.reset({
+        ...lesson,
+        description: lesson.description || "",
+        videoUrl: lesson.videoUrl || "",
+        thumbnailUrl: lesson.thumbnailUrl || ""
+      });
     } else {
       form.reset({
         title: "",
@@ -96,7 +100,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
         difficulty: "Beginner",
         duration: "",
         videoUrl: "",
-        thumbnailUrl: "https://placehold.co/400x225.png",
+        thumbnailUrl: "",
         status: "active",
       });
     }
@@ -106,7 +110,6 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
 
-      // Check if the selected category is new
       const categoryExists = categories.some(c => c.value.toLowerCase() === values.category.toLowerCase());
       if (!categoryExists && values.category) {
           const batch = writeBatch(db);
@@ -115,20 +118,22 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
           await batch.commit();
       }
 
+      const dataToSave = {
+        ...values,
+        thumbnailUrl: values.thumbnailUrl || "https://placehold.co/400x225.png"
+      }
+
       if (lesson) {
-        // Update existing lesson
         const lessonRef = doc(db, "lessons", lesson.id);
-        await setDoc(lessonRef, {...values, courseId}, { merge: true });
+        await setDoc(lessonRef, {...dataToSave, courseId}, { merge: true });
         toast({ title: "Success", description: "Lesson updated successfully." });
       } else {
-        // Add new lesson
         const lessonRef = await addDoc(collection(db, "lessons"), {
-          ...values,
+          ...dataToSave,
           courseId,
           createdAt: new Date(),
         });
         
-        // Add lesson ID to course
         const courseRef = doc(db, "courses", courseId);
         await updateDoc(courseRef, {
             lessonIds: arrayUnion(lessonRef.id)
@@ -188,9 +193,9 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="A complete guide to the fundamental grammar rules..." {...field} />
+                    <Textarea placeholder="A short summary of the lesson..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -259,7 +264,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
               name="videoUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>YouTube or Video URL</FormLabel>
+                  <FormLabel>YouTube or Video URL (Optional)</FormLabel>
                   <FormControl>
                     <Input placeholder="https://www.youtube.com/watch?v=..." {...field} />
                   </FormControl>
@@ -272,9 +277,9 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
               name="thumbnailUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Thumbnail Image URL</FormLabel>
+                  <FormLabel>Thumbnail Image Filename (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://placehold.co/400x225.png" {...field} />
+                    <Input placeholder="e.g., my-lesson-image (without extension)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
