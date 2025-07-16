@@ -20,4 +20,17 @@ export interface Lesson {
     videoUrl?: string;
     transcript?: string;
     status: 'active' | 'disabled';
+    courseId?: string; // To link back to course
+}
+
+export interface Question {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+}
+
+export interface Quiz {
+    id: string; // Same as lessonId
+    title: string;
+    questions: Question[];
 }

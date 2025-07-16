@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PlusCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { PlusCircle, ArrowLeft, Eye, EyeOff, ClipboardList } from "lucide-react";
 import Link from "next/link";
 import { LessonForm } from "@/components/admin/lesson-form";
 import { useToast } from "@/hooks/use-toast";
@@ -158,6 +158,12 @@ export default function ManageCourseDetailPage() {
                     <TableCell className="text-right space-x-2">
                        <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(lesson)}>
                         {lesson.status === 'active' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                       </Button>
+                       <Button asChild variant="outline" size="sm">
+                            <Link href={`/admin/quizzes/${lesson.id}`}>
+                                <ClipboardList className="mr-2 h-4 w-4" />
+                                Quiz
+                            </Link>
                        </Button>
                        <Button variant="outline" size="sm" onClick={() => handleEditLesson(lesson)}>Edit</Button>
                     </TableCell>

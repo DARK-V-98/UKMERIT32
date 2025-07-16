@@ -1,6 +1,7 @@
 
 "use client"
 
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -72,7 +73,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
         title: "",
         description: "",
         category: "",
-        difficulty: "",
+        difficulty: "Beginner",
         duration: "",
         videoUrl: "",
         thumbnailUrl: "https://placehold.co/400x225.png",
@@ -87,12 +88,13 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
       if (lesson) {
         // Update existing lesson
         const lessonRef = doc(db, "lessons", lesson.id);
-        await setDoc(lessonRef, values, { merge: true });
+        await setDoc(lessonRef, {...values, courseId}, { merge: true });
         toast({ title: "Success", description: "Lesson updated successfully." });
       } else {
         // Add new lesson
         const lessonRef = await addDoc(collection(db, "lessons"), {
           ...values,
+          courseId,
           createdAt: new Date(),
         });
         
