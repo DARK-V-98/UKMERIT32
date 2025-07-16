@@ -54,7 +54,7 @@ export default function LessonsPage() {
   const categories = useMemo(() => {
     const lessonCategories = allLessons
       .map(l => l.category)
-      .filter(c => typeof c === 'string' && c.length > 0); // Ensure category is a non-empty string
+      .filter((c): c is string => typeof c === 'string' && c.trim() !== '');
     return [...new Set(lessonCategories)];
   }, [allLessons]);
 
