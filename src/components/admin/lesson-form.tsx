@@ -1,11 +1,11 @@
 
 "use client"
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { collection, addDoc, doc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, arrayUnion, setDoc, getDocs, query, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "../ui/combobox";
 
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
   description: z.string().min(10, "Description must be at least 10 characters."),
-  category: z.string().min(1, "Please select a category."),
+  category: z.string().min(1, "Please select or create a category."),
   difficulty: z.string().min(1, "Please select a difficulty."),
   duration: z.string().min(1, "Please enter a duration."),
   videoUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
@@ -50,6 +51,8 @@ interface LessonFormProps {
 
 export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: LessonFormProps) {
   const { toast } = useToast();
+  const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: lesson || {
@@ -63,6 +66,19 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
       status: "active",
     },
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+        const categoriesCollection = collection(db, 'categories');
+        const q = query(categoriesCollection);
+        const snapshot = await getDocs(q);
+        const fetchedCategories = snapshot.docs.map(doc => ({ value: doc.data().name, label: doc.data().name }));
+        setCategories(fetchedCategories);
+    }
+    if(isOpen) {
+       fetchCategories();
+    }
+  }, [isOpen]);
 
   // This effect updates the form with new `lesson` data when it changes.
   React.useEffect(() => {
@@ -80,11 +96,21 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
         status: "active",
       });
     }
-  }, [lesson, form]);
+  }, [lesson, form, isOpen]);
 
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+
+      // Check if the selected category is new
+      const categoryExists = categories.some(c => c.value.toLowerCase() === values.category.toLowerCase());
+      if (!categoryExists && values.category) {
+          const batch = writeBatch(db);
+          const categoryRef = doc(collection(db, 'categories'));
+          batch.set(categoryRef, { name: values.category });
+          await batch.commit();
+      }
+
       if (lesson) {
         // Update existing lesson
         const lessonRef = doc(db, "lessons", lesson.id);
@@ -165,23 +191,14 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
                   control={form.control}
                   name="category"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Grammar">Grammar</SelectItem>
-                          <SelectItem value="Speaking">Speaking</SelectItem>
-                          <SelectItem value="Listening">Listening</SelectItem>
-                          <SelectItem value="Reading">Reading</SelectItem>
-                           <SelectItem value="Writing">Writing</SelectItem>
-                          <SelectItem value="Vocabulary">Vocabulary</SelectItem>
-                        </SelectContent>
-                      </Select>
+                       <Combobox 
+                        options={categories}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select or create..."
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
