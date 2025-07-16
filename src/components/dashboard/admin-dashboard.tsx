@@ -1,13 +1,28 @@
 
+"use client"
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { collection, query, orderBy, limit, onSnapshot, Timestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Users, BookOpen, MessageSquare, CheckCircle, ArrowRight } from "lucide-react";
-import { siteStats, users } from "@/lib/mock-data";
+import { siteStats } from "@/lib/mock-data";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+
+interface RecentUser {
+    id: string;
+    fullName: string;
+    email: string;
+    createdAt: Timestamp;
+    avatar?: string;
+}
+
 
 const monthlyData = [
   { month: 'Jan', signups: 120, active: 80 },
@@ -19,6 +34,34 @@ const monthlyData = [
 ];
 
 export default function AdminDashboard() {
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, orderBy("createdAt", "desc"), limit(5));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const usersData: RecentUser[] = [];
+        querySnapshot.forEach((doc) => {
+            usersData.push({ id: doc.id, ...doc.data() } as RecentUser);
+        });
+        setRecentUsers(usersData);
+        setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const formatDate = (timestamp: Timestamp) => {
+    if (!timestamp) return 'N/A';
+    return timestamp.toDate().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -137,32 +180,42 @@ export default function AdminDashboard() {
             <CardDescription>A list of the newest users on the platform.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead className="hidden md:table-cell">Email</TableHead>
-                  <TableHead className="text-right">Enrolled</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.slice(0, 5).map(user => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={user.avatar} alt={user.name} />
-                          <AvatarFallback>{user.name?.[0] || user.email?.[0] || 'U'}</AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{user.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{user.email}</TableCell>
-                    <TableCell className="text-right">{user.enrolled}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {loading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            ) : (
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead className="hidden md:table-cell">Email</TableHead>
+                    <TableHead className="text-right">Enrolled</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {recentUsers.map(user => (
+                    <TableRow key={user.id}>
+                        <TableCell>
+                        <div className="flex items-center gap-3">
+                            <Avatar>
+                            <AvatarImage src={user.avatar} alt={user.fullName} />
+                            <AvatarFallback>{user.fullName?.[0] || user.email?.[0] || 'U'}</AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{user.fullName}</span>
+                        </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{user.email}</TableCell>
+                        <TableCell className="text-right">{formatDate(user.createdAt)}</TableCell>
+                    </TableRow>
+                    ))}
+                </TableBody>
+                </Table>
+            )}
           </CardContent>
         </Card>
       </div>
