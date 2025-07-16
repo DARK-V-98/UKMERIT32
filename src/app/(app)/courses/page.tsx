@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from '@/lib/firebase';
 import type { Course } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,23 +22,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const coursesCollection = collection(db, 'courses');
-        const courseSnapshot = await getDocs(coursesCollection);
-        const coursesList = courseSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
-        setCourses(coursesList);
-      } catch (error) {
-        console.error("Error fetching courses: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const q = query(collection(db, 'courses'));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const coursesList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+      setCourses(coursesList);
+      setLoading(false);
+    });
 
-    fetchCourses();
+    return () => unsubscribe();
   }, []);
+
+  const filteredCourses = courses.filter(course => 
+    course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -51,7 +51,11 @@ export default function CoursesPage() {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
-          <Input placeholder="Search courses..." />
+          <Input 
+            placeholder="Search courses..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
@@ -73,38 +77,46 @@ export default function CoursesPage() {
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <Card key={course.id} className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
-              <CardHeader className="p-0">
-                 <Link href={`/courses/${course.id}`} className="block">
-                  <Image
-                    alt={course.title}
-                    className="aspect-video w-full object-cover"
-                    height="225"
-                    src={course.thumbnailUrl || "https://placehold.co/400x225.png"}
-                    width="400"
-                    data-ai-hint={course.imageHint || "course placeholder"}
-                  />
-                </Link>
-              </CardHeader>
-              <CardContent className="flex-1 p-4">
-                <CardTitle className="text-lg">
-                  <Link href={`/courses/${course.id}`} className="hover:text-primary transition-colors">
-                    {course.title}
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredCourses.map((course) => (
+              <Card key={course.id} className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+                <CardHeader className="p-0">
+                  <Link href={`/courses/${course.id}`} className="block">
+                    <Image
+                      alt={course.title}
+                      className="aspect-video w-full object-cover"
+                      height="225"
+                      src={course.thumbnailUrl || "https://placehold.co/400x225.png"}
+                      width="400"
+                      data-ai-hint={course.imageHint || "course placeholder"}
+                    />
                   </Link>
-                </CardTitle>
-                <CardDescription className="mt-2 text-sm">{course.description}</CardDescription>
-              </CardContent>
-              <CardFooter className="p-4 pt-0 flex justify-between items-center">
-                 <p className="text-xs text-muted-foreground">{course.lessonIds?.length || 0} Lessons</p>
-                 <Button asChild size="sm">
-                    <Link href={`/courses/${course.id}`}>Start Course</Link>
-                 </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                </CardHeader>
+                <CardContent className="flex-1 p-4">
+                  <CardTitle className="text-lg">
+                    <Link href={`/courses/${course.id}`} className="hover:text-primary transition-colors">
+                      {course.title}
+                    </Link>
+                  </CardTitle>
+                  <CardDescription className="mt-2 text-sm">{course.description}</CardDescription>
+                </CardContent>
+                <CardFooter className="p-4 pt-0 flex justify-between items-center">
+                  <p className="text-xs text-muted-foreground">{course.lessonIds?.length || 0} Lessons</p>
+                  <Button asChild size="sm">
+                      <Link href={`/courses/${course.id}`}>Start Course</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+           {filteredCourses.length === 0 && !loading && (
+            <div className="text-center text-muted-foreground py-16 col-span-full">
+              <h3 className="text-lg font-semibold">No courses found</h3>
+              <p>Try adjusting your search criteria or create a new course in the admin dashboard.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

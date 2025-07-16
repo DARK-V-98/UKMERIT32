@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { Lesson } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,21 +25,19 @@ export default function LessonsPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchLessons = async () => {
-      try {
-        const lessonsCollection = collection(db, 'lessons');
-        const q = query(lessonsCollection, where("status", "==", "active"));
-        const lessonSnapshot = await getDocs(q);
-        const lessonsList = lessonSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lesson));
-        setAllLessons(lessonsList);
-      } catch (error) {
-        console.error("Error fetching lessons: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const lessonsCollection = collection(db, 'lessons');
+    const q = query(lessonsCollection, where("status", "==", "active"));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const lessonsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lesson));
+      setAllLessons(lessonsList);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching lessons: ", error);
+      setLoading(false);
+    });
 
-    fetchLessons();
+    return () => unsubscribe();
   }, []);
 
   const filteredLessons = useMemo(() => {
@@ -87,6 +85,7 @@ export default function LessonsPage() {
           ))}
         </div>
       ) : (
+        <>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredLessons.map((lesson) => (
             <Card key={lesson.id} className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
@@ -117,13 +116,14 @@ export default function LessonsPage() {
             </Card>
           ))}
         </div>
-      )}
-       {!loading && filteredLessons.length === 0 && (
+        {!loading && filteredLessons.length === 0 && (
           <div className="text-center text-muted-foreground py-16 col-span-full">
             <h3 className="text-lg font-semibold">No lessons found</h3>
             <p>Try adjusting your search or filter criteria.</p>
           </div>
         )}
+        </>
+      )}
     </div>
   )
 }

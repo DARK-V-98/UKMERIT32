@@ -1,24 +1,50 @@
+
+"use client"
+
+import React, { useState, useEffect } from 'react';
 import Link from "next/link"
 import Image from "next/image"
-import { lessons } from "@/lib/mock-data"
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { notFound } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { PlayCircle, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from '@/components/ui/skeleton';
+import type { Lesson } from '@/lib/types';
+
 
 export default function LessonDetailPage({ params }: { params: { id: string } }) {
-  const lesson = lessons.find(l => l.id === params.id)
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!lesson) {
-    notFound()
-  }
+  useEffect(() => {
+    const fetchLesson = async () => {
+      setLoading(true);
+      const lessonRef = doc(db, 'lessons', params.id);
+      const lessonSnap = await getDoc(lessonRef);
+
+      if (lessonSnap.exists() && lessonSnap.data().status === 'active') {
+        setLesson({ id: lessonSnap.id, ...lessonSnap.data() } as Lesson);
+      } else {
+        notFound();
+      }
+      setLoading(false);
+    };
+
+    fetchLesson();
+  }, [params.id]);
+
 
   const renderVideoPlayer = (videoUrl: string) => {
+    if (!lesson) return null;
     // Check if it's a YouTube URL and format it for embedding
     if (videoUrl.includes("youtube.com")) {
-      const videoId = videoUrl.split('v=')[1];
+      const videoIdMatch = videoUrl.match(/(?:v=|\/embed\/|\/)([\w-]{11})/);
+      const videoId = videoIdMatch ? videoIdMatch[1] : null;
+      if (!videoId) return <p>Invalid YouTube URL</p>;
       const embedUrl = `https://www.youtube.com/embed/${videoId}`;
       return (
         <iframe
@@ -30,7 +56,7 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
         ></iframe>
       );
     }
-    // Assume it's a MediaDelivery iframe URL
+    // Assume it's a MediaDelivery iframe URL or other direct embed
     return (
        <iframe
           src={videoUrl}
@@ -40,6 +66,26 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
           className="w-full h-full"
         ></iframe>
     )
+  }
+  
+  if (loading) {
+    return (
+        <div className="mx-auto max-w-4xl space-y-8">
+            <div className="space-y-4">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-12 w-3/4" />
+                <Skeleton className="h-6 w-full" />
+            </div>
+            <Skeleton className="aspect-video w-full" />
+             <div className="flex justify-center">
+                <Skeleton className="h-12 w-64" />
+            </div>
+        </div>
+    )
+  }
+
+  if (!lesson) {
+    return notFound()
   }
 
   return (
@@ -59,11 +105,11 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
               ) : (
                 <>
                   <Image 
-                    src={lesson.thumbnailUrl!} 
+                    src={lesson.thumbnailUrl || "https://placehold.co/854x480.png"} 
                     alt={lesson.title}
                     layout="fill"
                     objectFit="cover"
-                    data-ai-hint={lesson.imageHint}
+                    data-ai-hint={lesson.imageHint || 'lesson placeholder'}
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <PlayCircle className="h-20 w-20 text-white/80 hover:text-white transition-colors cursor-pointer" />

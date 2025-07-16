@@ -1,7 +1,9 @@
+
 "use client"
 
-import { useState } from "react"
-import { lessons, quizzes } from "@/lib/mock-data"
+import { useState, useEffect } from "react"
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { notFound, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -9,19 +11,93 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { CheckCircle2, XCircle, Award } from "lucide-react"
+import type { Lesson, Quiz } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function QuizPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const lesson = lessons.find(l => l.id === params.id)
-  const quiz = quizzes[params.id]
+  
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<{[key: number]: string}>({})
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
 
-  if (!lesson || !quiz) {
-    notFound()
+  useEffect(() => {
+    const fetchQuizData = async () => {
+      setLoading(true);
+      const lessonRef = doc(db, 'lessons', params.id);
+      const quizRef = doc(db, 'quizzes', params.id);
+
+      const [lessonSnap, quizSnap] = await Promise.all([
+        getDoc(lessonRef),
+        getDoc(quizRef)
+      ]);
+
+      if (lessonSnap.exists() && lessonSnap.data().status === 'active') {
+        setLesson({ id: lessonSnap.id, ...lessonSnap.data() } as Lesson);
+      } else {
+        notFound();
+        return;
+      }
+      
+      if (quizSnap.exists()) {
+        setQuiz(quizSnap.data() as Quiz);
+      }
+      
+      setLoading(false);
+    };
+
+    fetchQuizData();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+       <div className="mx-auto max-w-2xl space-y-8">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-8 w-64" />
+        </div>
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center mb-2">
+              <Skeleton className="h-6 w-40" />
+            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-6 w-full pt-4" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!lesson) {
+    notFound();
+    return null;
+  }
+  
+  if (!quiz || quiz.questions.length === 0) {
+    return (
+       <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="w-full max-w-md text-center">
+            <CardHeader>
+              <CardTitle>No Quiz Available</CardTitle>
+              <CardDescription>There isn't a quiz for "{lesson.title}" yet. Check back later!</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full" onClick={() => router.back()}>Back to Lesson</Button>
+            </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   const handleAnswerSelect = (answer: string) => {
