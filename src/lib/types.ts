@@ -1,4 +1,6 @@
 
+import { Timestamp } from "firebase/firestore";
+
 export interface Course {
   id: string;
   title: string;
@@ -33,4 +35,18 @@ export interface Quiz {
     id: string; // Same as lessonId
     title: string;
     questions: Question[];
+}
+
+export interface User {
+  id: string;
+  uid: string;
+  fullName: string;
+  username?: string;
+  email: string;
+  photoURL?: string;
+  role: 'user' | 'admin';
+  status: 'active' | 'disabled';
+  createdAt: Timestamp;
+  profileComplete: boolean;
+  whatsapp?: string;
 }

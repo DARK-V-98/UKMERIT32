@@ -72,6 +72,7 @@ export default function SignupPage() {
         email: values.email,
         whatsapp: values.whatsapp,
         role: "user", // Assign a default role
+        status: "active", // Default status
         createdAt: new Date(),
         profileComplete: true, // Profile is complete with email signup
       });
@@ -106,6 +107,7 @@ export default function SignupPage() {
             fullName: user.displayName,
             email: user.email,
             role: "user",
+            status: "active",
             createdAt: new Date(),
             profileComplete: false, // Flag for profile completion
           }, { merge: true });

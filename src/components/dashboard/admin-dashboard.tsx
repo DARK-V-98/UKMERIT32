@@ -15,14 +15,7 @@ import { siteStats } from "@/lib/mock-data";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { subMonths, startOfMonth, format } from "date-fns";
-
-interface RecentUser {
-    id: string;
-    fullName: string;
-    email: string;
-    createdAt: Timestamp;
-    avatar?: string;
-}
+import type { User } from "@/lib/types";
 
 interface MonthlyData {
     month: string;
@@ -31,7 +24,7 @@ interface MonthlyData {
 }
 
 export default function AdminDashboard() {
-  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [recentUsers, setRecentUsers] = useState<User[]>([]);
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [loading, setLoading] = useState(true);
   const [chartLoading, setChartLoading] = useState(true);
@@ -41,10 +34,10 @@ export default function AdminDashboard() {
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("createdAt", "desc"), limit(5));
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const usersData: RecentUser[] = [];
+    const unsubscribeUsers = onSnapshot(q, (querySnapshot) => {
+        const usersData: User[] = [];
         querySnapshot.forEach((doc) => {
-            usersData.push({ id: doc.id, ...doc.data() } as RecentUser);
+            usersData.push({ id: doc.id, ...doc.data() } as User);
         });
         setRecentUsers(usersData);
         setLoading(false);
@@ -56,7 +49,7 @@ export default function AdminDashboard() {
         const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5));
         const usersGrowthQuery = query(collection(db, "users"), where("createdAt", ">=", sixMonthsAgo));
         
-        onSnapshot(usersGrowthQuery, (snapshot) => {
+        const unsubscribeGrowth = onSnapshot(usersGrowthQuery, (snapshot) => {
             const signupsByMonth: {[key: string]: number} = {};
 
             // Initialize last 6 months
@@ -66,7 +59,7 @@ export default function AdminDashboard() {
             }
 
             snapshot.forEach(doc => {
-                const user = doc.data() as RecentUser;
+                const user = doc.data() as User;
                 if (user.createdAt) {
                     const month = format(user.createdAt.toDate(), 'MMM');
                     if(signupsByMonth.hasOwnProperty(month)) {
@@ -86,11 +79,17 @@ export default function AdminDashboard() {
             setMonthlyData(data);
             setChartLoading(false);
         });
+        return unsubscribeGrowth;
     };
 
-    fetchUserGrowth();
+    const unsubscribeGrowth = fetchUserGrowth();
     
-    return () => unsubscribe();
+    return () => {
+        unsubscribeUsers();
+        // Here we need to call the unsubscribe function returned by fetchUserGrowth
+        // It's an async function so we have to handle the promise
+        Promise.resolve(unsubscribeGrowth).then(unsub => unsub());
+    };
   }, []);
 
   const formatDate = (timestamp: Timestamp) => {
@@ -181,7 +180,7 @@ export default function AdminDashboard() {
                 </Link>
             </Button>
              <Button asChild variant="outline" className="justify-start text-left h-auto py-4">
-                 <Link href="/admin/settings">
+                 <Link href="/forums">
                      <div className="flex items-start gap-4">
                         <MessageSquare className="h-6 w-6 text-primary mt-1" />
                         <div>
@@ -249,7 +248,7 @@ export default function AdminDashboard() {
                         <TableCell>
                         <div className="flex items-center gap-3">
                             <Avatar>
-                            <AvatarImage src={user.avatar} alt={user.fullName} />
+                            <AvatarImage src={user.photoURL} alt={user.fullName} />
                             <AvatarFallback>{user.fullName?.[0] || user.email?.[0] || 'U'}</AvatarFallback>
                             </Avatar>
                             <span className="font-medium">{user.fullName}</span>

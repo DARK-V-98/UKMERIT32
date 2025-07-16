@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { User } from "@/lib/types"
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,8 +31,23 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // The AuthProvider will handle the redirect
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data() as User;
+        if (userData.status === 'disabled') {
+            await auth.signOut();
+            toast({
+                title: "Account Disabled",
+                description: "Your account has been disabled by an administrator.",
+                variant: "destructive",
+            });
+            return;
+        }
+      }
+      
       router.push("/dashboard"); 
 
     } catch (error: any) {
@@ -62,11 +78,22 @@ export default function LoginPage() {
             fullName: user.displayName,
             email: user.email,
             role: "user",
+            status: "active",
             createdAt: new Date(),
             profileComplete: false,
           }, { merge: true });
         router.push("/complete-profile");
       } else {
+        const userData = userDoc.data() as User;
+        if (userData.status === 'disabled') {
+            await auth.signOut();
+            toast({
+                title: "Account Disabled",
+                description: "Your account has been disabled by an administrator.",
+                variant: "destructive",
+            });
+            return;
+        }
         router.push("/dashboard");
       }
 
