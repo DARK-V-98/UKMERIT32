@@ -6,7 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -16,14 +16,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Lesson } from '@/lib/types';
 
 
-export default function LessonDetailPage({ params }: { params: { id: string } }) {
+export default function LessonDetailPage() {
+  const params = useParams();
+  const lessonId = Array.isArray(params.id) ? params.id[0] : params.id;
+  
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!lessonId) return;
+
     const fetchLesson = async () => {
       setLoading(true);
-      const lessonRef = doc(db, 'lessons', params.id);
+      const lessonRef = doc(db, 'lessons', lessonId);
       const lessonSnap = await getDoc(lessonRef);
 
       if (lessonSnap.exists() && lessonSnap.data().status === 'active') {
@@ -35,7 +40,7 @@ export default function LessonDetailPage({ params }: { params: { id: string } })
     };
 
     fetchLesson();
-  }, [params.id]);
+  }, [lessonId]);
 
 
   const renderVideoPlayer = (videoUrl: string) => {
