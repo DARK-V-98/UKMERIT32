@@ -19,7 +19,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Lesson } from "@/lib/types";
+import type { Lesson, Course } from "@/lib/types";
 import {
   Select,
   SelectContent,
@@ -40,20 +40,22 @@ const formSchema = z.object({
   duration: z.string().min(1, "Please enter a duration."),
   videoUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
   thumbnailUrl: z.string().optional(),
-  status: z.enum(['active', 'disabled'])
+  status: z.enum(['active', 'disabled']),
+  courseId: z.string().optional(),
 });
 
 interface LessonFormProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  courseId: string;
   lesson?: Lesson;
+  courseId?: string; // This is now optional
   onClose?: () => void;
 }
 
 export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: LessonFormProps) {
   const { toast } = useToast();
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+  const [courses, setCourses] = useState<{ value: string; label: string }[]>([]);
   const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -67,20 +69,27 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
       videoUrl: "",
       thumbnailUrl: "",
       status: "active",
+      courseId: courseId || "",
     },
   });
 
-  const fetchCategories = async () => {
+  const fetchCategoriesAndCourses = async () => {
       const categoriesCollection = collection(db, 'categories');
-      const q = query(categoriesCollection);
-      const snapshot = await getDocs(q);
-      const fetchedCategories = snapshot.docs.map(doc => ({ value: doc.data().name, label: doc.data().name }));
+      const catQuery = query(categoriesCollection);
+      const catSnapshot = await getDocs(catQuery);
+      const fetchedCategories = catSnapshot.docs.map(doc => ({ value: doc.data().name, label: doc.data().name }));
       setCategories(fetchedCategories);
+
+      const coursesCollection = collection(db, 'courses');
+      const courseQuery = query(coursesCollection);
+      const courseSnapshot = await getDocs(courseQuery);
+      const fetchedCourses = courseSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Course })).map(c => ({ value: c.id, label: c.title }));
+      setCourses(fetchedCourses);
   }
 
   useEffect(() => {
     if(isOpen) {
-       fetchCategories();
+       fetchCategoriesAndCourses();
     }
   }, [isOpen]);
 
@@ -90,7 +99,8 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
         ...lesson,
         description: lesson.description || "",
         videoUrl: lesson.videoUrl || "",
-        thumbnailUrl: lesson.thumbnailUrl || ""
+        thumbnailUrl: lesson.thumbnailUrl || "",
+        courseId: lesson.courseId || courseId || ""
       });
     } else {
       form.reset({
@@ -102,14 +112,14 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
         videoUrl: "",
         thumbnailUrl: "",
         status: "active",
+        courseId: courseId || "",
       });
     }
-  }, [lesson, form, isOpen]);
+  }, [lesson, form, isOpen, courseId]);
 
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-
       const categoryExists = categories.some(c => c.value.toLowerCase() === values.category.toLowerCase());
       if (!categoryExists && values.category) {
           const batch = writeBatch(db);
@@ -125,21 +135,21 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
 
       if (lesson) {
         const lessonRef = doc(db, "lessons", lesson.id);
-        await setDoc(lessonRef, {...dataToSave, courseId}, { merge: true });
-        toast({ title: "Success", description: "Lesson updated successfully." });
+        await setDoc(lessonRef, dataToSave, { merge: true });
+        toast({ title: "Success", description: "Video updated successfully." });
       } else {
         const lessonRef = await addDoc(collection(db, "lessons"), {
           ...dataToSave,
-          courseId,
           createdAt: new Date(),
         });
         
-        const courseRef = doc(db, "courses", courseId);
-        await updateDoc(courseRef, {
-            lessonIds: arrayUnion(lessonRef.id)
-        });
-
-        toast({ title: "Success", description: "Lesson created successfully." });
+        if (values.courseId) {
+            const courseRef = doc(db, "courses", values.courseId);
+            await updateDoc(courseRef, {
+                lessonIds: arrayUnion(lessonRef.id)
+            });
+        }
+        toast({ title: "Success", description: "Video created successfully." });
       }
       form.reset();
       setIsOpen(false);
@@ -158,7 +168,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
     <CategoryForm 
         isOpen={isCategoryFormOpen} 
         setIsOpen={setIsCategoryFormOpen}
-        onCategoryAdded={fetchCategories}
+        onCategoryAdded={fetchCategoriesAndCourses}
     />
     <Dialog open={isOpen} onOpenChange={(open) => {
         setIsOpen(open);
@@ -168,9 +178,9 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
     }}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{lesson ? "Edit Lesson" : "Add New Lesson"}</DialogTitle>
+          <DialogTitle>{lesson ? "Edit Video" : "Add New Video"}</DialogTitle>
           <DialogDescription>
-            {lesson ? "Update the details of your lesson." : "Fill in the details for the new lesson."}
+            {lesson ? "Update the details of this video." : "Fill in the details for the new video."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -195,13 +205,13 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
                 <FormItem>
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="A short summary of the lesson..." {...field} />
+                    <Textarea placeholder="A short summary of the video..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <FormField
                   control={form.control}
                   name="category"
@@ -223,6 +233,31 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="courseId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Course (Optional)</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Assign to a course" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="">None</SelectItem>
+                          {courses.map(course => (
+                              <SelectItem key={course.value} value={course.value}>{course.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <FormField
                   control={form.control}
                   name="difficulty"
@@ -288,7 +323,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
 
             <div className="flex justify-end">
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Saving..." : "Save Lesson"}
+                {form.formState.isSubmitting ? "Saving..." : "Save Video"}
               </Button>
             </div>
           </form>

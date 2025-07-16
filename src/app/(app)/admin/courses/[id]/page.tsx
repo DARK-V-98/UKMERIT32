@@ -73,12 +73,12 @@ export default function ManageCourseDetailPage() {
         await updateDoc(lessonRef, { status: newStatus });
         toast({
             title: "Success",
-            description: `Lesson has been ${newStatus}.`,
+            description: `Video has been ${newStatus}.`,
         });
     } catch (error: any) {
         toast({
             title: "Error",
-            description: `Failed to update lesson status: ${error.message}`,
+            description: `Failed to update video status: ${error.message}`,
             variant: "destructive"
         });
     }
@@ -112,12 +112,12 @@ export default function ManageCourseDetailPage() {
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Manage: {course.title}</h1>
                 <p className="text-muted-foreground">
-                    Add, edit, and organize lessons for this course.
+                    Add, edit, and organize videos for this course.
                 </p>
             </div>
             <Button onClick={handleAddNewLesson}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Add New Lesson
+                Add New Video
             </Button>
         </div>
       </div>
@@ -132,8 +132,8 @@ export default function ManageCourseDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lessons in this Course</CardTitle>
-          <CardDescription>A list of all lessons in "{course.title}".</CardDescription>
+          <CardTitle>Videos in this Course</CardTitle>
+          <CardDescription>A list of all videos in "{course.title}".</CardDescription>
         </CardHeader>
         <CardContent>
             <Table>
@@ -173,7 +173,7 @@ export default function ManageCourseDetailPage() {
             </Table>
             {lessons.length === 0 && !loading && (
                 <div className="text-center text-muted-foreground py-8">
-                    No lessons have been added to this course yet.
+                    No videos have been added to this course yet.
                 </div>
             )}
         </CardContent>

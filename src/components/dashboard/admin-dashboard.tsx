@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { Users, BookOpen, MessageSquare, CheckCircle } from "lucide-react";
+import { Users, BookOpen, MessageSquare, CheckCircle, Video } from "lucide-react";
 import { siteStats } from "@/lib/mock-data";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
             <CardTitle>Admin Tools</CardTitle>
             <CardDescription>Quick links to manage your platform.</CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button asChild variant="outline" className="justify-start text-left h-auto py-4">
                 <Link href="/admin/courses">
                     <div className="flex items-start gap-4">
@@ -164,6 +164,17 @@ export default function AdminDashboard() {
                         <div>
                             <p className="font-semibold">Manage Courses</p>
                             <p className="text-sm text-muted-foreground">Add, edit, and structure courses.</p>
+                        </div>
+                    </div>
+                </Link>
+            </Button>
+            <Button asChild variant="outline" className="justify-start text-left h-auto py-4">
+                <Link href="/admin/videos">
+                    <div className="flex items-start gap-4">
+                        <Video className="h-6 w-6 text-primary mt-1" />
+                        <div>
+                            <p className="font-semibold">Manage Videos</p>
+                            <p className="text-sm text-muted-foreground">Add, edit, and organize all videos.</p>
                         </div>
                     </div>
                 </Link>
