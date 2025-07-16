@@ -7,10 +7,8 @@ import Image from "next/image"
 import { doc, getDoc, collection, getDocs, query, where, documentId } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { notFound, useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PlayCircle, BookOpen } from "lucide-react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import type { Course, Lesson } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -51,15 +49,6 @@ export default function CourseDetailPage() {
 
     fetchCourseData();
   }, [courseId]);
-
-  const lessonsByCategory = lessons.reduce((acc, lesson) => {
-    const category = lesson.category || "General";
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(lesson);
-    return acc;
-  }, {} as Record<string, Lesson[]>);
 
   const getImageUrl = (thumbnailUrl?: string) => {
     if (!thumbnailUrl) return "https://placehold.co/854x480.png";
@@ -127,52 +116,6 @@ export default function CourseDetailPage() {
             </Button>
           </div>
         )}
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen />
-              Course Content
-            </CardTitle>
-            <CardDescription>All the lessons included in the "{course.title}" course.</CardDescription>
-          </CardHeader>
-          <CardContent>
-             {lessons.length > 0 ? (
-                <Accordion type="multiple" defaultValue={Object.keys(lessonsByCategory)} className="w-full">
-                {Object.entries(lessonsByCategory).map(([category, categoryLessons]) => (
-                    <AccordionItem value={category} key={category}>
-                    <AccordionTrigger className="text-lg font-semibold">{category}</AccordionTrigger>
-                    <AccordionContent>
-                        <ul className="space-y-4 pt-2">
-                        {categoryLessons.map((lesson, index) => (
-                            <li key={lesson.id} className="flex items-center gap-4">
-                            <div className="flex-shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold">
-                                {index + 1}
-                            </div>
-                            <div className="flex-grow">
-                                <h4 className="font-semibold">{lesson.title}</h4>
-                                <p className="text-sm text-muted-foreground">{lesson.duration}</p>
-                            </div>
-                            <Button asChild variant="ghost" size="icon">
-                                <Link href={`/videos/${lesson.id}`}>
-                                <PlayCircle className="h-6 w-6" />
-                                </Link>
-                            </Button>
-                            </li>
-                        ))}
-                        </ul>
-                    </AccordionContent>
-                    </AccordionItem>
-                ))}
-                </Accordion>
-            ) : (
-                <div className="text-center text-muted-foreground py-8">
-                    <p>No lessons have been added to this course yet.</p>
-                </div>
-            )}
-          </CardContent>
-        </Card>
-
       </div>
     </div>
   )
