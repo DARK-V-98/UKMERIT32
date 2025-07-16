@@ -19,4 +19,5 @@ export interface Lesson {
     imageHint?: string;
     videoUrl?: string;
     transcript?: string;
+    status: 'active' | 'disabled';
 }

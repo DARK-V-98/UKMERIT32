@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { doc, onSnapshot, getDoc } from "firebase/firestore";
+import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { notFound, useParams } from "next/navigation";
 import type { Course, Lesson } from "@/lib/types";
@@ -10,18 +10,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PlusCircle, ArrowLeft } from "lucide-react";
+import { PlusCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { LessonForm } from "@/components/admin/lesson-form";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 export default function ManageCourseDetailPage() {
   const { id } = useParams();
   const courseId = Array.isArray(id) ? id[0] : id;
+  const { toast } = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
 
   useEffect(() => {
     if (!courseId) return;
@@ -51,6 +55,35 @@ export default function ManageCourseDetailPage() {
 
     return () => unsubscribe();
   }, [courseId]);
+  
+  const handleEditLesson = (lesson: Lesson) => {
+    setEditingLesson(lesson);
+    setIsFormOpen(true);
+  }
+
+  const handleAddNewLesson = () => {
+    setEditingLesson(null);
+    setIsFormOpen(true);
+  }
+
+  const handleToggleStatus = async (lesson: Lesson) => {
+    const lessonRef = doc(db, "lessons", lesson.id);
+    const newStatus = lesson.status === 'active' ? 'disabled' : 'active';
+    try {
+        await updateDoc(lessonRef, { status: newStatus });
+        toast({
+            title: "Success",
+            description: `Lesson has been ${newStatus}.`,
+        });
+    } catch (error: any) {
+        toast({
+            title: "Error",
+            description: `Failed to update lesson status: ${error.message}`,
+            variant: "destructive"
+        });
+    }
+  }
+
 
   if (loading) {
     return (
@@ -82,14 +115,20 @@ export default function ManageCourseDetailPage() {
                     Add, edit, and organize lessons for this course.
                 </p>
             </div>
-            <Button onClick={() => setIsFormOpen(true)}>
+            <Button onClick={handleAddNewLesson}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add New Lesson
             </Button>
         </div>
       </div>
       
-      <LessonForm isOpen={isFormOpen} setIsOpen={setIsFormOpen} courseId={courseId} />
+      <LessonForm 
+        isOpen={isFormOpen} 
+        setIsOpen={setIsFormOpen} 
+        courseId={courseId}
+        lesson={editingLesson || undefined}
+        onClose={() => setEditingLesson(null)}
+      />
 
       <Card>
         <CardHeader>
@@ -102,7 +141,7 @@ export default function ManageCourseDetailPage() {
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead className="hidden md:table-cell">Category</TableHead>
-                  <TableHead className="hidden md:table-cell">Duration</TableHead>
+                  <TableHead className="hidden md:table-cell">Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -111,9 +150,16 @@ export default function ManageCourseDetailPage() {
                   <TableRow key={lesson.id}>
                     <TableCell className="font-medium">{lesson.title}</TableCell>
                     <TableCell className="hidden md:table-cell">{lesson.category}</TableCell>
-                    <TableCell className="hidden md:table-cell">{lesson.duration}</TableCell>
-                    <TableCell className="text-right">
-                       <Button variant="outline" size="sm">Edit</Button>
+                    <TableCell className="hidden md:table-cell">
+                        <Badge variant={lesson.status === 'active' ? 'default' : 'secondary'}>
+                          {lesson.status}
+                        </Badge>
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                       <Button variant="ghost" size="icon" onClick={() => handleToggleStatus(lesson)}>
+                        {lesson.status === 'active' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                       </Button>
+                       <Button variant="outline" size="sm" onClick={() => handleEditLesson(lesson)}>Edit</Button>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { collection, addDoc, doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,8 @@ const formSchema = z.object({
   difficulty: z.string().min(1, "Please select a difficulty."),
   duration: z.string().min(1, "Please enter a duration."),
   videoUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
+  thumbnailUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
+  status: z.enum(['active', 'disabled'])
 });
 
 interface LessonFormProps {
@@ -42,26 +44,51 @@ interface LessonFormProps {
   setIsOpen: (isOpen: boolean) => void;
   courseId: string;
   lesson?: Lesson;
+  onClose?: () => void;
 }
 
-export function LessonForm({ isOpen, setIsOpen, courseId, lesson }: LessonFormProps) {
+export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: LessonFormProps) {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: lesson?.title || "",
-      description: lesson?.description || "",
-      category: lesson?.category || "",
-      difficulty: lesson?.difficulty || "",
-      duration: lesson?.duration || "",
-      videoUrl: lesson?.videoUrl || "",
+    defaultValues: lesson || {
+      title: "",
+      description: "",
+      category: "",
+      difficulty: "",
+      duration: "",
+      videoUrl: "",
+      thumbnailUrl: "",
+      status: "active",
     },
   });
+
+  // This effect updates the form with new `lesson` data when it changes.
+  React.useEffect(() => {
+    if (lesson) {
+      form.reset(lesson);
+    } else {
+      form.reset({
+        title: "",
+        description: "",
+        category: "",
+        difficulty: "",
+        duration: "",
+        videoUrl: "",
+        thumbnailUrl: "https://placehold.co/400x225.png",
+        status: "active",
+      });
+    }
+  }, [lesson, form]);
+
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (lesson) {
-        // Update existing lesson (not implemented yet)
+        // Update existing lesson
+        const lessonRef = doc(db, "lessons", lesson.id);
+        await setDoc(lessonRef, values, { merge: true });
+        toast({ title: "Success", description: "Lesson updated successfully." });
       } else {
         // Add new lesson
         const lessonRef = await addDoc(collection(db, "lessons"), {
@@ -79,6 +106,7 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson }: LessonFormPr
       }
       form.reset();
       setIsOpen(false);
+      onClose?.();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -89,7 +117,12 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson }: LessonFormPr
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          onClose?.();
+        }
+    }}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{lesson ? "Edit Lesson" : "Add New Lesson"}</DialogTitle>
@@ -195,6 +228,19 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson }: LessonFormPr
                   <FormLabel>YouTube or Video URL</FormLabel>
                   <FormControl>
                     <Input placeholder="https://www.youtube.com/watch?v=..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="thumbnailUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Thumbnail Image URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://placehold.co/400x225.png" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
