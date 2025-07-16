@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { notFound, useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -13,11 +13,16 @@ import { Progress } from "@/components/ui/progress"
 import { CheckCircle2, XCircle, Award } from "lucide-react"
 import type { Lesson, Quiz } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/app/(app)/layout";
+import { useToast } from "@/hooks/use-toast";
 
 export default function QuizPage() {
   const router = useRouter();
   const params = useParams();
   const lessonId = Array.isArray(params.id) ? params.id[0] : params.id;
+  
+  const { user } = useAuth();
+  const { toast } = useToast();
   
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -114,14 +119,35 @@ export default function QuizPage() {
     }
   }
 
-  const handleSubmit = () => {
-    let finalScore = 0
+  const handleSubmit = async () => {
+    let correctAnswers = 0
     quiz.questions.forEach((q, index) => {
       if(selectedAnswers[index] === q.correctAnswer) {
-        finalScore++;
+        correctAnswers++;
       }
-    })
-    setScore(finalScore)
+    });
+
+    const finalScore = Math.round((correctAnswers / quiz.questions.length) * 100);
+    setScore(finalScore);
+
+    if (user) {
+        try {
+            const progressRef = doc(db, `users/${user.uid}/progress`, lessonId);
+            await setDoc(progressRef, {
+                score: finalScore,
+                completed: true,
+                completedAt: serverTimestamp()
+            }, { merge: true });
+        } catch (error) {
+            console.error("Failed to save progress", error);
+            toast({
+                title: "Error",
+                description: "Could not save your quiz progress.",
+                variant: "destructive"
+            })
+        }
+    }
+
     setShowResult(true)
   }
 
@@ -129,7 +155,6 @@ export default function QuizPage() {
   const currentQuestion = quiz.questions[currentQuestionIndex]
 
   if(showResult) {
-    const percentage = Math.round((score / quiz.questions.length) * 100);
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card className="w-full max-w-md text-center">
@@ -141,8 +166,8 @@ export default function QuizPage() {
               <CardDescription>You finished the quiz for "{lesson.title}".</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-4xl font-bold">{percentage}%</p>
-              <p className="text-muted-foreground">You answered {score} out of {quiz.questions.length} questions correctly.</p>
+              <p className="text-4xl font-bold">{score}%</p>
+              <p className="text-muted-foreground">You answered {Math.round(score/100 * quiz.questions.length)} out of {quiz.questions.length} questions correctly.</p>
               <div className="flex gap-4">
                 <Button variant="outline" className="w-full" onClick={() => router.back()}>Back to Lesson</Button>
                 <Button className="w-full" onClick={() => router.push('/lessons')}>Explore More Lessons</Button>
@@ -202,3 +227,5 @@ export default function QuizPage() {
     </div>
   )
 }
+
+    

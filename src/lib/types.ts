@@ -50,3 +50,12 @@ export interface User {
   profileComplete: boolean;
   whatsapp?: string;
 }
+
+export interface UserProgress {
+    lessonId: string;
+    score: number;
+    completed: boolean;
+    completedAt: Timestamp;
+}
+
+    
