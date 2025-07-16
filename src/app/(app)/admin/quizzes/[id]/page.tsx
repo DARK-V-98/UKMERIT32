@@ -51,6 +51,9 @@ export default function ManageQuizPage() {
     control: form.control,
     name: 'questions',
   });
+  
+  // Watch the entire questions array for changes
+  const watchedQuestions = form.watch('questions');
 
   useEffect(() => {
     if (!lessonId) return;
@@ -205,14 +208,14 @@ export default function ManageQuizPage() {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Correct Answer</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select the correct answer" />
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                            {(form.getValues(`questions.${index}.options`) || []).filter(Boolean).map((option, optIndex) => (
+                            {(watchedQuestions[index]?.options || []).filter(Boolean).map((option, optIndex) => (
                                 <SelectItem key={optIndex} value={option}>
                                 {option}
                                 </SelectItem>
