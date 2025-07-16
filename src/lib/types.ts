@@ -8,6 +8,7 @@ export interface Course {
   thumbnailUrl?: string;
   imageHint?: string;
   lessonIds: string[];
+  createdAt: Timestamp;
 }
 
 export interface Lesson {
@@ -38,7 +39,7 @@ export interface Quiz {
 }
 
 export interface User {
-  id: string;
+  id:string;
   uid: string;
   fullName: string;
   username?: string;
