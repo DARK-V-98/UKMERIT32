@@ -15,8 +15,8 @@ export interface Lesson {
     category: string;
     difficulty: string;
     duration: string;
-    thumbnailUrl: string;
-    imageHint: string;
+    thumbnailUrl?: string;
+    imageHint?: string;
     videoUrl?: string;
     transcript?: string;
 }
