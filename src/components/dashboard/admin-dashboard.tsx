@@ -3,17 +3,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, limit, onSnapshot, Timestamp } from "firebase/firestore";
+import { collection, query, orderBy, limit, onSnapshot, Timestamp, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { Users, BookOpen, MessageSquare, CheckCircle, ArrowRight } from "lucide-react";
+import { Users, BookOpen, MessageSquare, CheckCircle } from "lucide-react";
 import { siteStats } from "@/lib/mock-data";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import { subMonths, startOfMonth, format } from "date-fns";
 
 interface RecentUser {
     id: string;
@@ -23,21 +24,20 @@ interface RecentUser {
     avatar?: string;
 }
 
-
-const monthlyData = [
-  { month: 'Jan', signups: 120, active: 80 },
-  { month: 'Feb', signups: 150, active: 100 },
-  { month: 'Mar', signups: 200, active: 160 },
-  { month: 'Apr', signups: 180, active: 140 },
-  { month: 'May', signups: 250, active: 200 },
-  { month: 'Jun', signups: 220, active: 180 },
-];
+interface MonthlyData {
+    month: string;
+    signups: number;
+    active: number; // For now, this will remain static
+}
 
 export default function AdminDashboard() {
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chartLoading, setChartLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch Recent Users
     const usersRef = collection(db, "users");
     const q = query(usersRef, orderBy("createdAt", "desc"), limit(5));
 
@@ -50,6 +50,46 @@ export default function AdminDashboard() {
         setLoading(false);
     });
 
+    // Fetch User Growth Data
+    const fetchUserGrowth = async () => {
+        setChartLoading(true);
+        const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5));
+        const usersGrowthQuery = query(collection(db, "users"), where("createdAt", ">=", sixMonthsAgo));
+        
+        onSnapshot(usersGrowthQuery, (snapshot) => {
+            const signupsByMonth: {[key: string]: number} = {};
+
+            // Initialize last 6 months
+            for (let i = 0; i < 6; i++) {
+                const month = format(subMonths(new Date(), i), 'MMM');
+                signupsByMonth[month] = 0;
+            }
+
+            snapshot.forEach(doc => {
+                const user = doc.data() as RecentUser;
+                if (user.createdAt) {
+                    const month = format(user.createdAt.toDate(), 'MMM');
+                    if(signupsByMonth.hasOwnProperty(month)) {
+                        signupsByMonth[month]++;
+                    }
+                }
+            });
+
+            const staticActiveUsers = [80, 100, 160, 140, 200, 180]; // Placeholder
+            
+            const data: MonthlyData[] = Object.keys(signupsByMonth).reverse().map((month, index) => ({
+                month,
+                signups: signupsByMonth[month],
+                active: staticActiveUsers[index] || staticActiveUsers[staticActiveUsers.length - 1] // fallback for safety
+            }));
+
+            setMonthlyData(data);
+            setChartLoading(false);
+        });
+    };
+
+    fetchUserGrowth();
+    
     return () => unsubscribe();
   }, []);
 
@@ -161,17 +201,23 @@ export default function AdminDashboard() {
             <CardDescription>Monthly new user signups and active users.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="signups" fill="hsl(var(--primary))" name="New Signups" />
-                <Bar dataKey="active" fill="hsl(var(--secondary))" name="Active Users" />
-              </BarChart>
-            </ResponsiveContainer>
+            {chartLoading ? (
+                <div className="flex items-center justify-center h-[300px]">
+                    <Skeleton className="h-full w-full" />
+                </div>
+            ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="signups" fill="hsl(var(--primary))" name="New Signups" />
+                    <Bar dataKey="active" fill="hsl(var(--secondary))" name="Active Users" />
+                </BarChart>
+                </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -221,4 +267,5 @@ export default function AdminDashboard() {
       </div>
     </div>
   )
-}
+
+    
