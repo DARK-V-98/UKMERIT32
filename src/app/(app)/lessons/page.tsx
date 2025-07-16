@@ -30,7 +30,6 @@ export default function LessonsPage() {
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
 
   useEffect(() => {
@@ -51,22 +50,14 @@ export default function LessonsPage() {
     fetchLessons();
   }, []);
 
-  const categories = useMemo(() => {
-    const lessonCategories = allLessons
-      .map(l => l.category)
-      .filter((c): c is string => typeof c === 'string' && c.trim() !== '');
-    return [...new Set(lessonCategories)];
-  }, [allLessons]);
-
   const filteredLessons = useMemo(() => {
     return allLessons
       .filter(lesson =>
         (lesson.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (lesson.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
-      .filter(lesson => (category ? lesson.category === category : true))
       .filter(lesson => (difficulty ? lesson.difficulty === difficulty : true));
-  }, [allLessons, searchTerm, category, difficulty]);
+  }, [allLessons, searchTerm, difficulty]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -86,17 +77,6 @@ export default function LessonsPage() {
           />
         </div>
         <div className="flex gap-4">
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
-              {categories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Select value={difficulty} onValueChange={setDifficulty}>
             <SelectTrigger className="w-full md:w-[180px]">
               <SelectValue placeholder="Difficulty" />
