@@ -13,13 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -30,7 +23,6 @@ export default function LessonsPage() {
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [difficulty, setDifficulty] = useState('');
 
   useEffect(() => {
     const fetchLessons = async () => {
@@ -56,8 +48,7 @@ export default function LessonsPage() {
         (lesson.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (lesson.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
-      .filter(lesson => (difficulty ? lesson.difficulty === difficulty : true));
-  }, [allLessons, searchTerm, difficulty]);
+  }, [allLessons, searchTerm]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -75,19 +66,6 @@ export default function LessonsPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        </div>
-        <div className="flex gap-4">
-          <Select value={difficulty} onValueChange={setDifficulty}>
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Difficulty" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Difficulties</SelectItem>
-              <SelectItem value="Beginner">Beginner</SelectItem>
-              <SelectItem value="Intermediate">Intermediate</SelectItem>
-              <SelectItem value="Advanced">Advanced</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
@@ -125,7 +103,7 @@ export default function LessonsPage() {
                 </Link>
               </CardHeader>
               <CardContent className="flex-1 p-4">
-                <Badge variant="outline" className="mb-2">{lesson.category}</Badge>
+                {lesson.category && <Badge variant="outline" className="mb-2">{lesson.category}</Badge>}
                 <CardTitle className="text-lg">
                   <Link href={`/lessons/${lesson.id}`} className="hover:text-primary transition-colors">
                     {lesson.title}
