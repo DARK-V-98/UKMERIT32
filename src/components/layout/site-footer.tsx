@@ -36,13 +36,6 @@ export function SiteFooter() {
                       <li><a href="https://wa.me/702210310" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2"><Phone className="h-4 w-4"/>WhatsApp</a></li>
                   </ul>
               </div>
-               <div>
-                  <h4 className="font-semibold mb-4">Legal</h4>
-                  <ul className="space-y-2">
-                      <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Privacy</Link></li>
-                      <li><Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Terms</Link></li>
-                  </ul>
-              </div>
           </div>
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
