@@ -68,9 +68,9 @@ export function FeaturedCourses() {
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className={courses.length < 3 ? "flex justify-center gap-6 flex-wrap" : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"}>
           {courses.map((course) => (
-            <Card key={course.id} className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+            <Card key={course.id} className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl w-full max-w-sm md:max-w-none">
                 <CardHeader className="p-0">
                   <Link href={`/courses/${course.id}`} className="block">
                     <Image
