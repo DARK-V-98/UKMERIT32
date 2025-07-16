@@ -28,6 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Combobox } from "../ui/combobox";
+import { PlusCircle } from "lucide-react";
+import { CategoryForm } from "./category-form";
 
 
 const formSchema = z.object({
@@ -52,6 +54,7 @@ interface LessonFormProps {
 export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: LessonFormProps) {
   const { toast } = useToast();
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,14 +70,15 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
     },
   });
 
+  const fetchCategories = async () => {
+      const categoriesCollection = collection(db, 'categories');
+      const q = query(categoriesCollection);
+      const snapshot = await getDocs(q);
+      const fetchedCategories = snapshot.docs.map(doc => ({ value: doc.data().name, label: doc.data().name }));
+      setCategories(fetchedCategories);
+  }
+
   useEffect(() => {
-    const fetchCategories = async () => {
-        const categoriesCollection = collection(db, 'categories');
-        const q = query(categoriesCollection);
-        const snapshot = await getDocs(q);
-        const fetchedCategories = snapshot.docs.map(doc => ({ value: doc.data().name, label: doc.data().name }));
-        setCategories(fetchedCategories);
-    }
     if(isOpen) {
        fetchCategories();
     }
@@ -145,6 +149,12 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
   };
 
   return (
+    <>
+    <CategoryForm 
+        isOpen={isCategoryFormOpen} 
+        setIsOpen={setIsCategoryFormOpen}
+        onCategoryAdded={fetchCategories}
+    />
     <Dialog open={isOpen} onOpenChange={(open) => {
         setIsOpen(open);
         if (!open) {
@@ -192,7 +202,12 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
                   name="category"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Category</FormLabel>
+                      <div className="flex items-center gap-2">
+                        <FormLabel>Category</FormLabel>
+                        <Button type="button" variant="ghost" size="icon" className="h-5 w-5" onClick={() => setIsCategoryFormOpen(true)}>
+                            <PlusCircle className="h-4 w-4 text-primary" />
+                        </Button>
+                      </div>
                        <Combobox 
                         options={categories}
                         value={field.value}
@@ -275,5 +290,6 @@ export function LessonForm({ isOpen, setIsOpen, courseId, lesson, onClose }: Les
         </Form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
