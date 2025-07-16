@@ -176,7 +176,7 @@ export default function ManageQuizPage() {
                     render={({ field: { value, onChange } }) => (
                         <FormItem>
                             <FormLabel>Options</FormLabel>
-                            {value?.map((opt, optIndex) => (
+                            {(value || []).map((opt, optIndex) => (
                                 <div key={optIndex} className="flex items-center gap-2">
                                     <Input value={opt} onChange={(e) => {
                                         const newOptions = [...value];
@@ -191,7 +191,7 @@ export default function ManageQuizPage() {
                                      </Button>
                                 </div>
                             ))}
-                            <Button type="button" size="sm" variant="outline" onClick={() => onChange([...value, ''])}>
+                            <Button type="button" size="sm" variant="outline" onClick={() => onChange([...(value || []), ''])}>
                                 Add Option
                             </Button>
                             <FormMessage />
@@ -212,9 +212,9 @@ export default function ManageQuizPage() {
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                            {form.getValues(`questions.${index}.options`).map((option, optIndex) => (
+                            {(form.getValues(`questions.${index}.options`) || []).filter(Boolean).map((option, optIndex) => (
                                 <SelectItem key={optIndex} value={option}>
-                                {option || `Option ${optIndex + 1}`}
+                                {option}
                                 </SelectItem>
                             ))}
                             </SelectContent>
