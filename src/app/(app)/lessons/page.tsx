@@ -51,7 +51,7 @@ export default function LessonsPage() {
     fetchLessons();
   }, []);
 
-  const categories = useMemo(() => [...new Set(allLessons.map(l => l.category))], [allLessons]);
+  const categories = useMemo(() => [...new Set(allLessons.map(l => l.category).filter(Boolean))], [allLessons]);
 
   const filteredLessons = useMemo(() => {
     return allLessons
