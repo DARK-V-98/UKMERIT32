@@ -50,7 +50,7 @@ export function CourseForm({ isOpen, setIsOpen, course, onClose }: CourseFormPro
       form.reset({
         title: course.title,
         description: course.description,
-        thumbnailUrl: course.thumbnailUrl,
+        thumbnailUrl: course.thumbnailUrl || "",
       });
     } else {
        form.reset({
