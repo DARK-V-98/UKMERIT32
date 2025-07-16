@@ -1,3 +1,4 @@
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -32,7 +33,7 @@ export function HeroSection() {
                 <Link href="/signup">Get Started for Free</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/lessons">Explore Lessons</Link>
+                <Link href="/videos">Explore Videos</Link>
               </Button>
             </div>
           </div>

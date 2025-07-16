@@ -25,7 +25,7 @@ export function SiteFooter() {
                   <h4 className="font-semibold mb-4">Platform</h4>
                   <ul className="space-y-2">
                       <li><Link href="/courses" className="text-sm text-muted-foreground hover:text-foreground">Courses</Link></li>
-                      <li><Link href="/lessons" className="text-sm text-muted-foreground hover:text-foreground">Lessons</Link></li>
+                      <li><Link href="/videos" className="text-sm text-muted-foreground hover:text-foreground">Videos</Link></li>
                       <li><Link href="/forums" className="text-sm text-muted-foreground hover:text-foreground">Forums</Link></li>
                   </ul>
               </div>

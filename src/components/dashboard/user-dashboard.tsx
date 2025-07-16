@@ -149,7 +149,7 @@ export default function UserDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lessons Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">Videos Watched</CardTitle>
             <BookCheck className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -228,7 +228,7 @@ export default function UserDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {continueLearning ? (
-                 <Link href={`/lessons/${continueLearning.id}`} className="flex items-start gap-4 group">
+                 <Link href={`/videos/${continueLearning.id}`} className="flex items-start gap-4 group">
                     <Image 
                       src={getImageUrl(continueLearning.thumbnailUrl)}
                       alt={continueLearning.title}
@@ -243,10 +243,10 @@ export default function UserDashboard() {
                     </div>
                   </Link>
               ) : (
-                <p className="text-sm text-muted-foreground">You've completed all available lessons. Great job!</p>
+                <p className="text-sm text-muted-foreground">You've completed all available videos. Great job!</p>
               )}
                <Button asChild className="w-full mt-2">
-                  <Link href="/lessons">View All Lessons</Link>
+                  <Link href="/videos">View All Videos</Link>
                </Button>
             </CardContent>
           </Card>

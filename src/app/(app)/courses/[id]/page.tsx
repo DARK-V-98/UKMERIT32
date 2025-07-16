@@ -121,7 +121,7 @@ export default function CourseDetailPage() {
         {lessons.length > 0 && (
           <div className="flex justify-center">
             <Button size="lg" asChild>
-              <Link href={`/lessons/${lessons[0].id}`}>
+              <Link href={`/videos/${lessons[0].id}`}>
                 Start Learning
               </Link>
             </Button>
@@ -154,7 +154,7 @@ export default function CourseDetailPage() {
                                 <p className="text-sm text-muted-foreground">{lesson.duration}</p>
                             </div>
                             <Button asChild variant="ghost" size="icon">
-                                <Link href={`/lessons/${lesson.id}`}>
+                                <Link href={`/videos/${lesson.id}`}>
                                 <PlayCircle className="h-6 w-6" />
                                 </Link>
                             </Button>

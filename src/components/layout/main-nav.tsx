@@ -23,7 +23,7 @@ export function MainNav() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/courses", label: "Courses" },
-    { href: "/lessons", label: "Lessons" },
+    { href: "/videos", label: "Videos" },
     { href: "/forums", label: "Forums" },
   ];
 

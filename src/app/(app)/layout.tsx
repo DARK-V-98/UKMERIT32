@@ -82,7 +82,7 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
     if (loading) return;
 
     const isAuthPage = ['/login', '/signup', '/'].includes(pathname);
-    const isPublicPage = pathname.startsWith('/lessons/');
+    const isPublicPage = pathname.startsWith('/videos/');
     const isProfileCompletionPage = pathname === '/complete-profile';
 
     if (!user) {
@@ -104,7 +104,7 @@ function ProtectedRoutes({ children }: { children: React.ReactNode }) {
 
   }, [user, loading, profileComplete, router, pathname]);
 
-  if (loading || (!user && !['/login', '/signup', '/'].includes(pathname) && !pathname.startsWith('/lessons/')) || (user && profileComplete === false && pathname !== '/complete-profile')) {
+  if (loading || (!user && !['/login', '/signup', '/'].includes(pathname) && !pathname.startsWith('/videos/')) || (user && profileComplete === false && pathname !== '/complete-profile')) {
     return (
        <div className="container py-8">
          <div className="space-y-8">
