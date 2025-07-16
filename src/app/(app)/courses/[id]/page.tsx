@@ -6,7 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { doc, getDoc, collection, getDocs, query, where, documentId } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlayCircle, BookOpen } from "lucide-react"
@@ -14,15 +14,20 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import type { Course, Lesson } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function CourseDetailPage() {
+  const params = useParams();
+  const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
+
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!courseId) return;
+
     const fetchCourseData = async () => {
       setLoading(true);
-      const courseRef = doc(db, "courses", params.id);
+      const courseRef = doc(db, "courses", courseId);
       const courseSnap = await getDoc(courseRef);
 
       if (!courseSnap.exists()) {
@@ -45,7 +50,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
     };
 
     fetchCourseData();
-  }, [params.id]);
+  }, [courseId]);
 
   const lessonsByCategory = lessons.reduce((acc, lesson) => {
     const category = lesson.category || "General";
