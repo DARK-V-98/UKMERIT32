@@ -4,7 +4,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from "firebase/auth"
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, sendPasswordResetEmail } from "firebase/auth"
 import { auth, db } from "@/lib/firebase"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
@@ -108,6 +108,30 @@ export default function LoginPage() {
     }
   }
 
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to reset your password.",
+        variant: "destructive"
+      });
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Check your inbox for a link to reset your password."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  }
+
   return (
     <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
@@ -133,12 +157,14 @@ export default function LoginPage() {
           <div className="grid gap-2">
             <div className="flex items-center">
               <Label htmlFor="password">Password</Label>
-              <Link
-                href="#"
-                className="ml-auto inline-block text-sm underline"
+              <Button
+                type="button"
+                variant="link"
+                className="ml-auto inline-block h-auto p-0 text-sm underline"
+                onClick={handlePasswordReset}
               >
                 Forgot your password?
-              </Link>
+              </Button>
             </div>
             <Input 
               id="password" 
