@@ -1,3 +1,4 @@
+
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
@@ -32,10 +33,12 @@ export function FeaturedCourses() {
   }, []);
 
   const getImageUrl = (thumbnailUrl?: string) => {
-    if (!thumbnailUrl) return "https://placehold.co/400x225.png";
-    if (thumbnailUrl.startsWith('http')) return thumbnailUrl;
+    if (!thumbnailUrl || thumbnailUrl.startsWith('http') || thumbnailUrl.startsWith('https://placehold.co')) {
+      return thumbnailUrl || "https://placehold.co/400x225.png";
+    }
     return `/${thumbnailUrl}.png`;
   }
+
 
   return (
     <section id="featured-courses" className="container mx-auto px-4 py-16 sm:py-24 bg-muted/50 rounded-lg">
