@@ -40,6 +40,12 @@ export default function CoursesPage() {
     course.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const getImageUrl = (thumbnailUrl?: string) => {
+    if (!thumbnailUrl) return "https://placehold.co/400x225.png";
+    if (thumbnailUrl.startsWith('http')) return thumbnailUrl;
+    return `/${thumbnailUrl}.png`;
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -87,7 +93,7 @@ export default function CoursesPage() {
                       alt={course.title}
                       className="aspect-video w-full object-cover"
                       height="225"
-                      src={course.thumbnailUrl || "https://placehold.co/400x225.png"}
+                      src={getImageUrl(course.thumbnailUrl)}
                       width="400"
                       data-ai-hint={course.imageHint || "course placeholder"}
                     />

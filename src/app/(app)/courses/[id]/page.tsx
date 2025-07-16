@@ -61,6 +61,12 @@ export default function CourseDetailPage() {
     return acc;
   }, {} as Record<string, Lesson[]>);
 
+  const getImageUrl = (thumbnailUrl?: string) => {
+    if (!thumbnailUrl) return "https://placehold.co/854x480.png";
+    if (thumbnailUrl.startsWith('http')) return thumbnailUrl;
+    return `/${thumbnailUrl}.png`;
+  }
+
   if (loading) {
     return (
         <div className="mx-auto max-w-4xl space-y-8">
@@ -102,7 +108,7 @@ export default function CourseDetailPage() {
           <CardContent className="p-0">
             <div className="aspect-video bg-muted flex items-center justify-center relative">
               <Image 
-                src={course.thumbnailUrl || "https://placehold.co/854x480.png"} 
+                src={getImageUrl(course.thumbnailUrl)}
                 alt={course.title}
                 layout="fill"
                 objectFit="cover"

@@ -23,6 +23,7 @@ import type { Course } from "@/lib/types";
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
   description: z.string().min(10, "Description must be at least 10 characters."),
+  thumbnailUrl: z.string().optional(),
 });
 
 interface CourseFormProps {
@@ -38,6 +39,7 @@ export function CourseForm({ isOpen, setIsOpen, course }: CourseFormProps) {
     defaultValues: {
       title: course?.title || "",
       description: course?.description || "",
+      thumbnailUrl: course?.thumbnailUrl || "",
     },
   });
 
@@ -102,6 +104,19 @@ export function CourseForm({ isOpen, setIsOpen, course }: CourseFormProps) {
                     <Textarea placeholder="A complete guide to the fundamental grammar rules..." {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="thumbnailUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image Filename</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., course-image (without .png)" {...field} />
+                  </FormControl>
+                   <FormMessage />
                 </FormItem>
               )}
             />
