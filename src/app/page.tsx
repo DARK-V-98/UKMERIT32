@@ -4,6 +4,7 @@ import { HeroSection } from '@/components/landing/hero-section';
 import { CtaSection } from '@/components/landing/cta-section';
 import { FeaturedCourses } from '@/components/landing/featured-courses';
 import { AboutSection } from '@/components/landing/about-section';
+import { ReviewsSection } from '@/components/landing/reviews-section';
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
         <HeroSection />
         <FeaturedCourses />
         <AboutSection />
+        <ReviewsSection />
         <CtaSection />
       </main>
       <SiteFooter />

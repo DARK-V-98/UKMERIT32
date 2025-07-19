@@ -58,3 +58,11 @@ export interface UserProgress {
     completed: boolean;
     completedAt: Timestamp;
 }
+
+export interface Review {
+  id: string;
+  name: string;
+  review: string;
+  imageFilename: string;
+  createdAt: Timestamp;
+}
