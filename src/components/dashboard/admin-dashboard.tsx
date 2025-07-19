@@ -3,31 +3,44 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, limit, onSnapshot, Timestamp, where } from "firebase/firestore";
+import { collection, query, orderBy, limit, onSnapshot, Timestamp, where, getCountFromServer, collectionGroup } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Users, BookOpen, MessageSquare, CheckCircle, Video } from "lucide-react";
 import { siteStats } from "@/lib/mock-data";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
-import { subMonths, startOfMonth, format } from "date-fns";
+import { subMonths, startOfMonth, format, subDays, startOfDay } from "date-fns";
 import type { User } from "@/lib/types";
 
 interface MonthlyData {
     month: string;
     signups: number;
-    active: number; // For now, this will remain static
+    active: number; 
+}
+
+interface SiteStats {
+    totalUsers: { count: number; increase: number };
+    activeCourses: { count: number; increase: number };
+    completedLessons: { count: number; increase: number };
+    forumThreads: { count: number; increase: number };
 }
 
 export default function AdminDashboard() {
   const [recentUsers, setRecentUsers] = useState<User[]>([]);
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [chartLoading, setChartLoading] = useState(true);
+  const [stats, setStats] = useState<SiteStats>({
+    totalUsers: { count: 0, increase: 0 },
+    activeCourses: { count: 0, increase: 0 },
+    completedLessons: { count: 0, increase: 0 },
+    forumThreads: { count: 489, increase: 25 }, // Mock data for now
+  });
 
   useEffect(() => {
     // Fetch Recent Users
@@ -42,12 +55,47 @@ export default function AdminDashboard() {
         setRecentUsers(usersData);
         setLoading(false);
     });
+    
+    // Fetch aggregated stats
+    const fetchStats = async () => {
+        setStatsLoading(true);
 
-    // Fetch User Growth Data
+        const sevenDaysAgo = subDays(new Date(), 7);
+        const thirtyDaysAgo = subDays(new Date(), 30);
+
+        // Users
+        const usersCollection = collection(db, "users");
+        const totalUsersQuery = await getCountFromServer(usersCollection);
+        const newUsersQuery = await getCountFromServer(query(usersCollection, where("createdAt", ">=", sevenDaysAgo)));
+
+        // Courses
+        const coursesCollection = collection(db, "courses");
+        const totalCoursesQuery = await getCountFromServer(coursesCollection);
+        const newCoursesQuery = await getCountFromServer(query(coursesCollection, where("createdAt", ">=", thirtyDaysAgo)));
+
+        // Completed Lessons
+        const progressCollection = collectionGroup(db, 'progress');
+        const totalCompletedQuery = await getCountFromServer(progressCollection);
+        const newCompletedQuery = await getCountFromServer(query(progressCollection, where("completedAt", ">=", sevenDaysAgo)));
+
+        setStats(prev => ({
+            ...prev,
+            totalUsers: { count: totalUsersQuery.data().count, increase: newUsersQuery.data().count },
+            activeCourses: { count: totalCoursesQuery.data().count, increase: newCoursesQuery.data().count },
+            completedLessons: { count: totalCompletedQuery.data().count, increase: newCompletedQuery.data().count },
+        }));
+
+        setStatsLoading(false);
+    };
+
+    fetchStats();
+
+
+    // Fetch User Growth Data for chart
     const fetchUserGrowth = async () => {
         setChartLoading(true);
         const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5));
-        const usersGrowthQuery = query(collection(db, "users"), where("createdAt", ">=", sixMonthsAgo));
+        const usersGrowthQuery = query(collection(db, "users"), where("createdAt", ">=", Timestamp.fromDate(sixMonthsAgo)));
         
         const unsubscribeGrowth = onSnapshot(usersGrowthQuery, (snapshot) => {
             const signupsByMonth: {[key: string]: number} = {};
@@ -86,8 +134,6 @@ export default function AdminDashboard() {
     
     return () => {
         unsubscribeUsers();
-        // Here we need to call the unsubscribe function returned by fetchUserGrowth
-        // It's an async function so we have to handle the promise
         Promise.resolve(unsubscribeGrowth).then(unsub => unsub());
     };
   }, []);
@@ -100,6 +146,29 @@ export default function AdminDashboard() {
         day: 'numeric',
     });
   }
+  
+  const StatCard = ({ title, value, increase, timePeriod, icon, loading }: { title: string, value: number, increase: number, timePeriod: string, icon: React.ReactNode, loading: boolean}) => (
+    <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            {icon}
+        </CardHeader>
+        <CardContent>
+            {loading ? (
+                <>
+                    <Skeleton className="h-8 w-24 mb-1" />
+                    <Skeleton className="h-4 w-32" />
+                </>
+            ) : (
+                <>
+                    <div className="text-2xl font-bold">{value.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground">+{increase.toLocaleString()} this {timePeriod}</p>
+                </>
+            )}
+        </CardContent>
+    </Card>
+  )
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -109,47 +178,39 @@ export default function AdminDashboard() {
       </div>
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{siteStats.totalUsers.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+50 this week</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
-            <BookOpen className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{siteStats.activeCourses}</div>
-            <p className="text-xs text-muted-foreground">+1 new course this month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Forum Threads</CardTitle>
-            <MessageSquare className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{siteStats.forumThreads}</div>
-            <p className="text-xs text-muted-foreground">+25 threads this week</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed Lessons</CardTitle>
-            <CheckCircle className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{siteStats.completedLessons.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+150 this week</p>
-          </CardContent>
-        </Card>
-      </div>
+            <StatCard
+                title="Total Users"
+                value={stats.totalUsers.count}
+                increase={stats.totalUsers.increase}
+                timePeriod="week"
+                icon={<Users className="h-4 w-4 text-primary" />}
+                loading={statsLoading}
+            />
+            <StatCard
+                title="Active Courses"
+                value={stats.activeCourses.count}
+                increase={stats.activeCourses.increase}
+                timePeriod="month"
+                icon={<BookOpen className="h-4 w-4 text-primary" />}
+                loading={statsLoading}
+            />
+            <StatCard
+                title="Forum Threads"
+                value={stats.forumThreads.count}
+                increase={stats.forumThreads.increase}
+                timePeriod="week"
+                icon={<MessageSquare className="h-4 w-4 text-primary" />}
+                loading={false} // Mock data for now
+            />
+            <StatCard
+                title="Completed Lessons"
+                value={stats.completedLessons.count}
+                increase={stats.completedLessons.increase}
+                timePeriod="week"
+                icon={<CheckCircle className="h-4 w-4 text-primary" />}
+                loading={statsLoading}
+            />
+        </div>
       
        <Card>
         <CardHeader>
