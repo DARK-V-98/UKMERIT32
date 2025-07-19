@@ -10,10 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Users, BookOpen, MessageSquare, CheckCircle, Video, Star } from "lucide-react";
-import { siteStats } from "@/lib/mock-data";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
-import { subMonths, startOfMonth, format, subDays, startOfDay } from "date-fns";
+import { subMonths, startOfMonth, format, subDays } from "date-fns";
 import type { User } from "@/lib/types";
 
 interface MonthlyData {
@@ -60,8 +59,8 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
         setStatsLoading(true);
 
-        const sevenDaysAgo = subDays(new Date(), 7);
-        const thirtyDaysAgo = subDays(new Date(), 30);
+        const sevenDaysAgo = Timestamp.fromDate(subDays(new Date(), 7));
+        const thirtyDaysAgo = Timestamp.fromDate(subDays(new Date(), 30));
 
         // Users
         const usersCollection = collection(db, "users");
@@ -75,7 +74,7 @@ export default function AdminDashboard() {
 
         // Completed Lessons
         const progressCollection = collectionGroup(db, 'progress');
-        const totalCompletedQuery = await getCountFromServer(progressCollection);
+        const totalCompletedQuery = await getCountFromServer(query(progressCollection, where("completed", "==", true)));
         const newCompletedQuery = await getCountFromServer(query(progressCollection, where("completedAt", ">=", sevenDaysAgo)));
 
         setStats(prev => ({
@@ -130,11 +129,11 @@ export default function AdminDashboard() {
         return unsubscribeGrowth;
     };
 
-    const unsubscribeGrowth = fetchUserGrowth();
+    const unsubscribeGrowthPromise = fetchUserGrowth();
     
     return () => {
         unsubscribeUsers();
-        Promise.resolve(unsubscribeGrowth).then(unsub => unsub());
+        unsubscribeGrowthPromise.then(unsub => unsub());
     };
   }, []);
 
@@ -349,5 +348,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   )
-
-    
+}
