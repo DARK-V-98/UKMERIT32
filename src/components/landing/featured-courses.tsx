@@ -41,7 +41,7 @@ export function FeaturedCourses() {
 
 
   return (
-    <section id="featured-courses" className="container mx-auto px-4 py-16 sm:py-24 bg-muted/50 rounded-lg">
+    <section id="featured-courses" className="container mx-auto px-4 py-16 sm:py-24 bg-primary/10 rounded-lg">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
           Featured Courses
